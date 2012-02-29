@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="LABEL_ACCOUNT">Account</string>
+    <string name="LABEL_AMOUNT_DUE">Amount Due</string>
+    <string name="LABEL_AMOUNT_PAID">Amount Paid</string>
+    <string name="LABEL_DUE">Due</string>
+    <string name="LABEL_TRANSFER">Transfer</string>
+    <string name="LABEL_REMINDERS">Reminders</string>
+    <string name="LABEL_PAY">Pay</string>
+    <string name="LABEL_CONFIRMATION">Confirmation</string>
+    <string name="LABEL_DATES">Dates</string>
+    <string name="LABEL_SAVE">Save</string>
+    <string name="LABEL_CANCEL">Cancel</string>
+    
+</resources>
