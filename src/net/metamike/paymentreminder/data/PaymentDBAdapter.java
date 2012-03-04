@@ -1,4 +1,4 @@
-package net.metamike.paymentreminder;
+package net.metamike.paymentreminder.data;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -39,7 +39,7 @@ public class PaymentDBAdapter {
 			KEY_AMOUNT_PAID + " INTEGER DEFAULT 0, " +
 			KEY_DATE_DUE + " DATE, " +
 			KEY_DATE_TRANSFER + " DATE, " +
-			KEY_CONFIRMATION + " TEXT);";
+			KEY_CONFIRMATION + " TEXT NOT NULL DEFAULT '');";
 
 	private static final String REMINDERS_CREATE = 
 			"CREATE TABLE " + REMINDERS_TABLE + "(" +
@@ -75,27 +75,43 @@ public class PaymentDBAdapter {
 		database.close();
 	}
 	
+	//TODO: Provide feed back if account is null
 	public boolean insertPayment(String account, BigDecimal amt_due, Date dt_due, BigDecimal amt_paid, Date dt_xfer, String conf) {
 		ContentValues values = new ContentValues();
 		values.put(KEY_ACCOUNT, account);
-		values.put(KEY_AMOUNT_DUE, convertBigDecimal(amt_due));
-		values.put(KEY_DATE_DUE, dt_due.getTime());
-		values.put(KEY_AMOUNT_PAID, convertBigDecimal(amt_paid));
-		values.put(KEY_DATE_TRANSFER, dt_xfer.getTime());
-		values.put(KEY_CONFIRMATION, conf);
+		if (amt_due != null)
+				values.put(KEY_AMOUNT_DUE, convertBigDecimal(amt_due));
+		if (dt_due != null) 
+			values.put(KEY_DATE_DUE, dt_due.getTime());
+		if (amt_paid != null)
+			values.put(KEY_AMOUNT_PAID, convertBigDecimal(amt_paid));
+		if (dt_xfer != null)
+			values.put(KEY_DATE_TRANSFER, dt_xfer.getTime());
+		if (conf != null)
+			values.put(KEY_CONFIRMATION, conf);
 		return database.insert(PAYMENTS_TABLE, null, values) > 0;
 	}
-	
+
+	//TODO: Test
+	public boolean insertPayment(String account) {
+		ContentValues values = new ContentValues();
+		values.put(KEY_ACCOUNT, account);
+		return database.insert(PAYMENTS_TABLE, null, values) > 0;
+	}
+
+	//TODO: Provide feed back to user if nulls are sent
 	public boolean insertReminder(Integer _id, ReminderType type, Date time) {
 		ContentValues values = new ContentValues();
 		values.put(KEY_PAYMENT_ID, _id);
-		values.put(KEY_TYPE, type.ordinal());
-		values.put(KEY_TIME, time.getTime());
+		if (type != null)
+			values.put(KEY_TYPE, type.ordinal());
+		if (time != null)
+			values.put(KEY_TIME, time.getTime());
 		return database.insert(REMINDERS_TABLE, null, values) > 0;
 	}
 
 	public Long convertBigDecimal(BigDecimal src) {
-		return src.movePointRight(3).longValueExact();
+		return src == null ? null : src.movePointRight(3).longValueExact();
 	}
 	
 	private static class Helper extends SQLiteOpenHelper {
