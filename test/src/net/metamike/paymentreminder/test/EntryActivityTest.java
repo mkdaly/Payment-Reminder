@@ -16,6 +16,7 @@ public class EntryActivityTest extends ActivityInstrumentationTestCase2<EntryAct
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
+		setActivityInitialTouchMode(false);
 		activity = this.getActivity();
 
 	}
@@ -31,5 +32,7 @@ public class EntryActivityTest extends ActivityInstrumentationTestCase2<EntryAct
 		
 		
 	}
+	
+	
 
 }

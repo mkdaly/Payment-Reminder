@@ -92,7 +92,6 @@ public class PaymentDBAdapter {
 		return database.insert(PAYMENTS_TABLE, null, values) > 0;
 	}
 
-	//TODO: Test
 	public boolean insertPayment(String account) {
 		ContentValues values = new ContentValues();
 		values.put(KEY_ACCOUNT, account);
