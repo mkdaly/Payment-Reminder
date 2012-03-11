@@ -3,7 +3,9 @@ package net.metamike.paymentreminder.test;
 import net.metamike.paymentreminder.EntryActivity;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
+import android.widget.Button;
 import android.widget.RelativeLayout;
+import android.widget.TableLayout;
 
 public class EntryActivityTest extends ActivityInstrumentationTestCase2<EntryActivity> {
 	private EntryActivity activity;
@@ -27,12 +29,15 @@ public class EntryActivityTest extends ActivityInstrumentationTestCase2<EntryAct
 	}
 
 	public void testLayout() {
-		RelativeLayout entryView = (RelativeLayout) activity.findViewById(net.metamike.paymentreminder.R.id.entryView);
-		
-		
-		
+		TableLayout entryView = (TableLayout) activity.findViewById(net.metamike.paymentreminder.R.id.entryView);
+		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.button_cancel));
+		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.button_save));
+		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_account));
+		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_amount));
+		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_confirmation));
+		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_due_date));
+		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_pay_reminder));
+		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_transfer_date));
+		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_transfer_reminder));
 	}
-	
-	
-
 }

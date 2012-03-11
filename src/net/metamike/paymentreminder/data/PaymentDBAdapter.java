@@ -1,7 +1,11 @@
 package net.metamike.paymentreminder.data;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Date;
+
+import net.metamike.paymentreminder.R;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -9,7 +13,10 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
+import android.text.format.Time;
 import android.util.Log;
+import android.util.TimeFormatException;
 
 public class PaymentDBAdapter {
 	private static final String TAG = "PaymentDBAdaper";
@@ -51,9 +58,16 @@ public class PaymentDBAdapter {
 	
 	private SQLiteDatabase database;
 	private Helper dbHelper;
+	private NumberFormat formatter;
+	private Context context;
 	
 	public PaymentDBAdapter(Context context) {
 		dbHelper = new Helper(context);
+		formatter = NumberFormat.getInstance();
+		this.context = context;
+		if (formatter instanceof DecimalFormat) {
+			((DecimalFormat)formatter).setParseBigDecimal(true);
+		}
 	}
 	
 	//For testing-purposes only!
@@ -76,17 +90,19 @@ public class PaymentDBAdapter {
 	}
 	
 	//TODO: Provide feed back if account is null
-	public boolean insertPayment(String account, BigDecimal amt_due, Date dt_due, BigDecimal amt_paid, Date dt_xfer, String conf) {
+	public boolean insertPayment(String account, Long amt_due, Long dt_due, Long amt_paid, Long dt_xfer, String conf) {
+		if (TextUtils.isEmpty(account))
+			return false; //Account needs to be *something*
 		ContentValues values = new ContentValues();
 		values.put(KEY_ACCOUNT, account);
 		if (amt_due != null)
-				values.put(KEY_AMOUNT_DUE, convertBigDecimal(amt_due));
+				values.put(KEY_AMOUNT_DUE, amt_due);
 		if (dt_due != null) 
-			values.put(KEY_DATE_DUE, dt_due.getTime());
+			values.put(KEY_DATE_DUE, dt_due);
 		if (amt_paid != null)
-			values.put(KEY_AMOUNT_PAID, convertBigDecimal(amt_paid));
+			values.put(KEY_AMOUNT_PAID, amt_paid);
 		if (dt_xfer != null)
-			values.put(KEY_DATE_TRANSFER, dt_xfer.getTime());
+			values.put(KEY_DATE_TRANSFER, dt_xfer);
 		if (conf != null)
 			values.put(KEY_CONFIRMATION, conf);
 		return database.insert(PAYMENTS_TABLE, null, values) > 0;
@@ -109,8 +125,46 @@ public class PaymentDBAdapter {
 		return database.insert(REMINDERS_TABLE, null, values) > 0;
 	}
 
-	public Long convertBigDecimal(BigDecimal src) {
-		return src == null ? null : src.movePointRight(3).longValueExact();
+	public Long convertStringToLongMill(String src) throws NumberFormatException {
+		if (TextUtils.isEmpty(src))
+			return null;
+		try {
+			Number val = formatter.parse(src);
+			if (val instanceof BigDecimal) {
+				/*TODO: Probably should set the decimal places
+				 * as a setting.
+				 */
+				if (((BigDecimal) val).scale() > 2) {
+					//Not dealing with mills as input.
+					throw new NumberFormatException(context.getString(R.string.more_than_cents));
+				}
+				return ((BigDecimal)val).movePointRight(3).longValue();
+			}
+		} catch (java.text.ParseException p) {
+			throw new NumberFormatException(p.getLocalizedMessage());
+		}
+		//TODO: Handle cases when src isn't a nice number
+		return null;
+	}
+	
+	/**
+	 * Parses a date in the form YYYY-MM-DD and returns the number
+	 * of milliseconds from the Unix epoch.
+	 * 
+	 * @param src
+	 * @return
+	 * @throws Exception
+	 */
+	public Long convertDateStringToMilliseconds(String src) throws TimeFormatException {
+		if (TextUtils.isEmpty(src))
+			return null;
+		Time t = new Time();
+		t.parse3339(src);
+		if (t.allDay)
+				return t.toMillis(false);
+		else
+			//throw TimeFormatException.class.newInstance();
+			return null;
 	}
 	
 	private static class Helper extends SQLiteOpenHelper {

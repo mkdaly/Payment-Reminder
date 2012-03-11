@@ -11,6 +11,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 import android.test.RenamingDelegatingContext;
+import android.text.format.Time;
+import android.util.TimeFormatException;
 
 public class DBAdapterTest extends AndroidTestCase {
 	private RenamingDelegatingContext testContext;
@@ -30,9 +32,9 @@ public class DBAdapterTest extends AndroidTestCase {
 	
 	public void testInserts() {
 		String account = "Test Account";
-		BigDecimal amt_due = new BigDecimal("40.00");
+		String amt_due = "40.00";
 		Date dt_due = new Date();
-		BigDecimal amt_paid = new BigDecimal("430.43");
+		String amt_paid = "430.43";
 		Date dt_xfer = new Date();
 		String conf = "confirmed";
 		
@@ -40,8 +42,13 @@ public class DBAdapterTest extends AndroidTestCase {
 		adapter.open();
 		SQLiteDatabase db = adapter.getDatabase();
 		
-		assertTrue("Failed inserting payment.", adapter.insertPayment(
-				account, amt_due, dt_due, amt_paid, dt_xfer, conf));
+		try {
+			assertTrue("Failed inserting payment.", adapter.insertPayment(
+				account, adapter.convertStringToLongMill(amt_due), dt_due.getTime(), adapter.convertStringToLongMill(amt_paid), dt_xfer.getTime(), conf));
+		} catch  (Exception e) {
+			//TODO: Fix type when new ex type is written
+			fail(e.getMessage());
+		}
 		Cursor c = db.rawQuery("SELECT * FROM payments", null);
 		assertEquals(1, c.getCount());
 		assertTrue(c.moveToFirst());
@@ -75,9 +82,9 @@ public class DBAdapterTest extends AndroidTestCase {
 
 	public void testInsertsConstraintsPayments() {
 		String account = "Test Account Constraints";
-		BigDecimal amt_due = new BigDecimal("40.00");
+		String amt_due = "40.00";
 		Date dt_due = new Date();
-		BigDecimal amt_paid = new BigDecimal("430.43");
+		String amt_paid = "430.43";
 		Date dt_xfer = new Date();
 		String conf = "confirmed";
 		
@@ -86,7 +93,12 @@ public class DBAdapterTest extends AndroidTestCase {
 		SQLiteDatabase db = adapter.getDatabase();
 		
 		//Account needs to be specified
-		assertFalse(adapter.insertPayment(null, amt_due, dt_due, amt_paid, dt_xfer, conf));
+		try {
+			assertFalse(adapter.insertPayment(null, adapter.convertStringToLongMill(amt_due), dt_due.getTime(), adapter.convertStringToLongMill(amt_paid), dt_xfer.getTime(), conf));
+		} catch (Exception e) {
+			//TODO: Fix type when new ex type is written
+			fail(e.getMessage());
+		}
 		
 		//Nulls for these should use the DEFAULTs 
 		assertTrue("Succeeded inserting payment with null account.", adapter.insertPayment(
@@ -127,25 +139,48 @@ public class DBAdapterTest extends AndroidTestCase {
 		assertFalse(adapter.insertReminder(_id, type, null));
 	}
 
-	public void testConvertBigDecimal() {
+	public void testConvertStringToLongMill() {
 		PaymentDBAdapter adapter = new PaymentDBAdapter(testContext);
-		BigDecimal src = new BigDecimal(1);
-		assertEquals((Long)(1L * 1000), adapter.convertBigDecimal(src));
+		//TODO: Fix type when new ex type is written
+		try {
+			assertEquals((Long)(1L * 1000), adapter.convertStringToLongMill("1"));
+			assertEquals((Long)(1010L), adapter.convertStringToLongMill("1.01"));
+			assertEquals((Long)(34010L), adapter.convertStringToLongMill("34.01"));
+			assertEquals((Long)(10L), adapter.convertStringToLongMill(".01"));
+			assertEquals((Long)(-10L), adapter.convertStringToLongMill("-.01"));
+			assertEquals(null, adapter.convertStringToLongMill(null));
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+		try {
+			assertEquals((Long)(0L), adapter.convertStringToLongMill(".001"));
+			fail("Exception not thrown.");
+		} catch (NumberFormatException nfe) {
+			assertEquals(testContext.getString(net.metamike.paymentreminder.R.string.more_than_cents), nfe.getMessage());
+		}
+	}
+	
+	public void testConvertDateStringToMilliseconds() {
+		PaymentDBAdapter adapter = new PaymentDBAdapter(testContext);
+		Time date = new Time();
+		date.set(1, 0, 2012); //Jan 1 2012
+		String dateString = "2012-01-01";
+		String datetimeString = "2012-01-01T16:00:00.000Z";
+		String badFormat = "Jan 01, 2012";
 		
-		src = new BigDecimal("1.01");
-		assertEquals((Long)(1010L), adapter.convertBigDecimal(src));
-		
-		src = new BigDecimal("34.01");
-		assertEquals((Long)(34010L), adapter.convertBigDecimal(src));
-		
-		src = new BigDecimal(".01");
-		assertEquals((Long)(10L), adapter.convertBigDecimal(src));
-		
-		src = new BigDecimal("-.01");
-		assertEquals((Long)(-10L), adapter.convertBigDecimal(src));
-		
-		assertEquals(null, adapter.convertBigDecimal(null));
-		
+		try {
+			assertEquals((Long)date.toMillis(true), adapter.convertDateStringToMilliseconds(dateString));
+			assertNull(adapter.convertDateStringToMilliseconds(null));
+			assertNull(adapter.convertDateStringToMilliseconds(datetimeString));
+		} catch (Exception e) {
+			fail(e.getMessage());
+		}
+		try {
+			assertNull(adapter.convertDateStringToMilliseconds(badFormat));
+			fail("Exception not thrown.");
+		} catch (TimeFormatException tfe) {
+			//ok.
+		}
 	}
 
 }

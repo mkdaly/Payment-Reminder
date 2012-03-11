@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/entryView"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:stretchColumns="*">
 	<!-- Account Info  -->
     <TextView
         android:id="@+id/label_account"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
         android:text="@string/LABEL_ACCOUNT"
         android:textAppearance="?android:attr/textAppearanceMedium" />
     <EditText
         android:id="@+id/field_account"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/label_account" >
+        android:inputType="text">
 
         <requestFocus />
     </EditText>
@@ -28,137 +25,111 @@
         android:id="@+id/label_amount_due"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/field_account"
         android:text="@string/LABEL_AMOUNT_DUE"
         android:textAppearance="?android:attr/textAppearanceMedium" />
     <EditText
         android:id="@+id/field_amount"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/label_amount_due" />
+        android:inputType="numberDecimal" />
 
     <!-- Date Info -->
     <TextView
         android:id="@+id/label_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/field_amount"
         android:text="@string/LABEL_DATES"
         android:textAppearance="?android:attr/textAppearanceMedium" />
+	<TableRow> 
+    	<TextView
+	        android:id="@+id/label_due_date"
+    	    android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:text="@string/LABEL_DUE"
+        	android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <TextView
-        android:id="@+id/label_due_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/label_date"
-        android:layout_below="@id/label_date"
-        android:text="@string/LABEL_DUE"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+    	<TextView
+        	android:id="@+id/label_transfer_date"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+    	    android:text="@string/LABEL_TRANSFER"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	</TableRow>
+	<TableRow>
+	    <EditText
+	        android:id="@+id/field_due_date"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:inputType="date" />
+	
+	    <EditText
+	        android:id="@+id/field_transfer_date"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:inputType="date" />
+	</TableRow>
 
-    <TextView
-        android:id="@+id/label_transfer_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/label_due_date"
-        android:layout_alignParentRight="true"
-        android:text="@string/LABEL_TRANSFER"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <EditText
-        android:id="@+id/field_due_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/label_due_date"
-        android:layout_below="@id/label_due_date"
-        android:inputType="date" />
-
-    <EditText
-        android:id="@+id/field_transfer_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/label_transfer_date"
-        android:layout_alignLeft="@id/label_transfer_date"
-        android:inputType="date" />
-
-    <!-- Reminders Info -->
+	<!-- Reminders Info -->
     <TextView
         android:id="@+id/label_reminders"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/field_due_date"
         android:text="@string/LABEL_REMINDERS"
         android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <TextView
-        android:id="@+id/label_due_reminder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/label_reminders"
-        android:layout_below="@id/label_reminders"
-        android:text="@string/LABEL_DUE"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <TextView
-        android:id="@+id/label_transfer_reminder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/label_due_reminder"
-        android:layout_alignParentRight="true"
-        android:text="@string/LABEL_TRANSFER"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-
-    <EditText
-        android:id="@+id/field_pay_reminder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/label_reminders"
-        android:layout_below="@id/label_due_reminder"
-        android:inputType="date" />
-
-    <EditText
-        android:id="@+id/field_transfer_reminder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/label_transfer_reminder"
-        android:layout_below="@id/label_transfer_reminder"
-        android:inputType="date" />
-
+    <TableRow>
+	    <TextView
+	        android:id="@+id/label_due_reminder"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/LABEL_DUE"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	
+	    <TextView
+	        android:id="@+id/label_transfer_reminder"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/LABEL_TRANSFER"
+	        android:textAppearance="?android:attr/textAppearanceMedium" />
+	</TableRow>
+	<TableRow>
+	    <EditText
+	        android:id="@+id/field_pay_reminder"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:inputType="date" />
+	
+	    <EditText
+	        android:id="@+id/field_transfer_reminder"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:inputType="date" />
+	</TableRow>
+	
     <!-- Confirmation -->
     <TextView
         android:id="@+id/label_confirmation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/field_pay_reminder"
         android:text="@string/LABEL_CONFIRMATION"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <EditText
         android:id="@+id/field_confirmation"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@id/label_confirmation"
-        android:layout_below="@id/label_confirmation" />
+        android:layout_height="wrap_content"/>
 
     <!-- Actions -->
-    <Button
-        android:id="@+id/button_save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@id/field_confirmation"
-        android:text="@string/LABEL_SAVE" />
-
-    <Button
-        android:id="@+id/button_cancel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@id/field_confirmation"
-        android:text="@string/LABEL_CANCEL" />
-
-</RelativeLayout>
+    <TableRow>
+	    <Button
+	        android:id="@+id/button_save"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/LABEL_SAVE" />
+	
+	    <Button
+	        android:id="@+id/button_cancel"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/LABEL_CANCEL" />
+	</TableRow>
+</TableLayout>
