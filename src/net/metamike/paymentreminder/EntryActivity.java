@@ -47,17 +47,25 @@ public class EntryActivity extends Activity {
         
         saveButton = (Button)findViewById(R.id.button_save);
         saveButton.setOnClickListener( new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				saveEntry(v);
-			}
-		});
+			@Override public void onClick(View v) { saveEntry(v); } });
         
         cancelButton = (Button)findViewById(R.id.button_cancel);
+        cancelButton.setOnClickListener( new View.OnClickListener() {
+			@Override public void onClick(View v) { clearFields(v); } });
+    }
+    
+    private void clearFields(View button) {
+    	accountField.getText().clear();
+    	amountDueField.getText().clear();
+    	dueDateField.getText().clear();
+    	transferDateField.getText().clear();
+    	confirmationField.getText().clear();
+    	accountField.requestFocus();
     }
     
     private void saveEntry(View button) {
     	String account = accountField.getText().toString();
+    	Boolean error = Boolean.FALSE;
     	//TODO: Should an empty string be allowed
     	if (account == null) {
     		//TODO: show dialog
@@ -71,9 +79,11 @@ public class EntryActivity extends Activity {
 		} catch (NumberFormatException nfe) {
 			// TODO: Show Dialog
 			nfe.printStackTrace();
+			error = Boolean.TRUE;
 		} catch (TimeFormatException tfe) {
 			// TODO: Show Dialog
-			tfe.printStackTrace();			
+			tfe.printStackTrace();
+			error = Boolean.TRUE;
 		}
     	
     	Long dt_xfer= null;
@@ -81,11 +91,13 @@ public class EntryActivity extends Activity {
 			 dt_xfer = dbAdapter.convertDateStringToMilliseconds(transferDateField.getText().toString());
 		} catch (TimeFormatException tfe) {
 			// TODO: Show Dialog
-			tfe.printStackTrace();			
+			tfe.printStackTrace();
+			error = Boolean.TRUE;
 		}
-    	
-    	String conf = confirmationField.getText().toString();
-    	dbAdapter.insertPayment(account, amt_due, dt_due, null, dt_xfer, conf);
+    	if (!error) {
+    		String conf = confirmationField.getText().toString();
+    		dbAdapter.insertPayment(account, amt_due, dt_due, null, dt_xfer, conf);
+    	}
     }
 
 	@Override
