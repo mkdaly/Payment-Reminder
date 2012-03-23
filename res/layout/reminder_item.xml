@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/reminderItemView"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+
+    <TextView
+        android:id="@+id/firstLine"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="First Line of the Reminder"
+        style="@style/ReminderText" />
+
+    <TextView
+        android:id="@+id/secondLine"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/firstLine"
+        android:text="Second Line of the Reminder"
+        style="@style/ReminderText" />
+
+</RelativeLayout>

@@ -1,6 +1,7 @@
 package net.metamike.paymentreminder.test;
 
 import java.math.BigDecimal;
+import java.util.Calendar;
 import java.util.Date;
 
 import net.metamike.paymentreminder.data.PaymentDBAdapter;
@@ -181,6 +182,45 @@ public class DBAdapterTest extends AndroidTestCase {
 		} catch (TimeFormatException tfe) {
 			//ok.
 		}
+	}
+	
+	public void testGetAllPayments() {
+		PaymentDBAdapter adapter = new PaymentDBAdapter(testContext);
+		adapter.open();
+		Cursor c = adapter.getAllPayments();
+		assertEquals(0, c.getCount());
+		
+		String[] expectedAccounts = {"Test 1", "Test 2", 
+				"Test 4", "Test 3"};
+		
+		Long[] expectedLongs = new Long[4];
+		Time t = new Time();
+		t.set(1, Calendar.JANUARY, 2012);
+		expectedLongs[0] = Long.valueOf(t.toMillis(false));
+		t.set(1, Calendar.FEBRUARY, 2012);
+		expectedLongs[1] = Long.valueOf(t.toMillis(false));
+		t.set(1, Calendar.JUNE, 2012);
+		expectedLongs[2] = Long.valueOf(t.toMillis(false));		
+		t.set(2, Calendar.JANUARY, 2012);
+		expectedLongs[3] = Long.valueOf(t.toMillis(false));
+		
+		for (int i = 0; i < expectedAccounts.length; i++) {
+			assertTrue(adapter.insertPayment(expectedAccounts[i], null, expectedLongs[i], null, null, null));
+		}
+		
+		c = adapter.getAllPayments();
+		assertEquals(4, c.getCount());
+		int[] expectedOrder = {0, 3, 1, 2}; //Jan 1; Jan 2; Feb 1; Jun 1
+		c.moveToFirst();
+		for(Integer i: expectedOrder) {
+			assertEquals(expectedAccounts[i], Payments.getAccount(c));
+			assertEquals(expectedLongs[i], Payments.getDueDateAsLong(c));
+			if (!c.isLast())
+				assertTrue(c.moveToNext());
+		}
+		c.close();
+		adapter.close();
+		
 	}
 
 }

@@ -214,8 +214,5 @@ public class EntryActivityUnitTest extends ActivityUnitTestCase<EntryActivity> {
 		assertEquals(expectedValues[5], Payments.getTransferDateAsLong(c));
 		assertEquals(expectedValues[6], Payments.getTransferDate(c));
 		assertEquals(expectedValues[7], Payments.getConfirmation(c));
-		
 	}
-
-
 }

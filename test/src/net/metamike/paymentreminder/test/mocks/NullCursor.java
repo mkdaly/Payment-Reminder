@@ -1,6 +1,6 @@
-package net.metamike.paymentreminder.test;
+package net.metamike.paymentreminder.test.mocks;
 
-class NullCursor extends MockCursor {
+public class NullCursor extends MockCursor {
 
 	@Override
 	public int getColumnIndex(String columnName) {

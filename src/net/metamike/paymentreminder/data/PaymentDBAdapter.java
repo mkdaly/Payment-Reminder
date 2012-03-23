@@ -9,6 +9,7 @@ import net.metamike.paymentreminder.R;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -123,6 +124,10 @@ public class PaymentDBAdapter {
 		if (time != null)
 			values.put(KEY_TIME, time.getTime());
 		return database.insert(REMINDERS_TABLE, null, values) > 0;
+	}
+	
+	public Cursor getAllPayments() {
+		return database.query(PAYMENTS_TABLE, null, null, null, null, null, KEY_DATE_DUE);
 	}
 
 	public Long convertStringToLongMill(String src) throws NumberFormatException {

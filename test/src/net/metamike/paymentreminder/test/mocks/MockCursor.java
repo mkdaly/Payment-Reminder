@@ -15,7 +15,7 @@
  */
 
 //package android.test.mock;
-package net.metamike.paymentreminder.test;
+package net.metamike.paymentreminder.test.mocks;
 
 import android.content.ContentResolver;
 import android.database.CharArrayBuffer;

@@ -4,6 +4,8 @@ import java.util.Date;
 
 import net.metamike.paymentreminder.data.PaymentDBAdapter;
 import net.metamike.paymentreminder.data.Payments;
+import net.metamike.paymentreminder.test.mocks.NullCursor;
+import net.metamike.paymentreminder.test.mocks.MockCursor;
 import android.database.Cursor;
 import android.test.AndroidTestCase;
 
