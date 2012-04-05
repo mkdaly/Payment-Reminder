@@ -1,13 +1,18 @@
 package net.metamike.paymentreminder.test;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import net.metamike.paymentreminder.data.PaymentDBAdapter;
-import net.metamike.paymentreminder.data.Payments;
+import net.metamike.paymentreminder.data.Payment;
 import net.metamike.paymentreminder.test.mocks.NullCursor;
 import net.metamike.paymentreminder.test.mocks.MockCursor;
 import android.database.Cursor;
 import android.test.AndroidTestCase;
+import android.text.format.Time;
+import android.util.Pair;
 
 public class PaymentsTest extends AndroidTestCase {
 	Cursor nullCursor;
@@ -18,90 +23,132 @@ public class PaymentsTest extends AndroidTestCase {
 	}
 
 	
-	public void testGetAccount() {
-		String ex = "account";
-		Cursor knownCursor = new KnownCursor(ex);
-		assertEquals(ex, Payments.getAccount(knownCursor));
-	}
-	
-
-	public void testGetAmountDue() {
-		assertEquals((Long)0L, Payments.getAmountDue(nullCursor));
+	public void testConstructors() {
+		Pair<Object, String> exAccount;
+		Pair<Object, String> exAmountDue;
+		Pair<Object, String> exDateDue;
+		Pair<Object, String> exAmountPaid;
+		Pair<Object, String> exDatePaid;
+		Pair<Object, String> exConf;
+		Map<Integer, Object> values = new HashMap<Integer, Object>();
 		
-		Long ex = 50L;
-		Cursor knownCursor = new KnownCursor(ex);
-		assertEquals(ex, Payments.getAmountDue(knownCursor));
-	}
-
-	public void testGetAmountPaid() {
-		assertEquals((Long)0L, Payments.getAmountPaid(nullCursor));
+		Payment p;
 		
-		Long ex = 100L;
-		Cursor knownCursor = new KnownCursor(ex);
-		assertEquals(ex, Payments.getAmountPaid(knownCursor));
-	}
-
-	public void testGetDueDate() {
-		assertNull(Payments.getDueDate(nullCursor));
-		
-		Date ex = new Date();
-		Cursor knownCursor = new KnownCursor(ex.getTime());
-		assertEquals(ex, Payments.getDueDate(knownCursor));
-	}
-
-	public void testGetDueDateAsLong() {
-		assertNull(Payments.getDueDateAsLong(nullCursor));
-		
-		Date ex = new Date();
-		Cursor knownCursor = new KnownCursor(ex.getTime());
-		assertEquals((Long)ex.getTime(), Payments.getDueDateAsLong(knownCursor));
-
-	}
-
-	public void testGetTransferDate() {
-		assertNull(Payments.getTransferDate(nullCursor));
-		
-		Date ex = new Date();
-		Cursor knownCursor = new KnownCursor(ex.getTime());
-		assertEquals(ex, Payments.getTransferDate(knownCursor));
-
-	}
-
-	public void testGetTransferDateAsLong() {
-		assertNull(Payments.getTransferDateAsLong(nullCursor));
-
-		Date ex = new Date();
-		Cursor knownCursor = new KnownCursor(ex.getTime());
-		assertEquals((Long)ex.getTime(), Payments.getTransferDateAsLong(knownCursor));
-		
-	}
-
-	public void testGetConfirmation() {
-		assertEquals("", Payments.getConfirmation(nullCursor));
-		
-		String ex = "conf";
-		Cursor knownCursor = new KnownCursor(ex);
-		assertEquals(ex, Payments.getConfirmation(knownCursor));
-	}
-
-	
-	private class KnownCursor extends MockCursor {
-		private final int ACCOUNT = 1;
-		private final int AMOUNT_DUE = 2;
-		private final int AMOUNT_PAID = 3;
-		private final int DATE_DUE = 4;
-		private final int DATE_XFER = 5;
-		private final int CONF = 6;
-
-		private long longValue = -1;
-		private String stringValue = "";
-
-		public KnownCursor(long longValue) {
-			this.longValue = longValue;
+		/** Test string constructors */
+		try {
+			p = new Payment((String)null);
+			fail("No exception thrown for null account.");
+		} catch (IllegalArgumentException e) {
+			//pass
 		}
 
-		public KnownCursor(String stringValue) {
-			this.stringValue = stringValue;
+		try {
+			exAccount = new Pair<Object, String>("", "");
+			p = new Payment(exAccount.second);
+			fail("No exception thrown for empty account.");
+		} catch (IllegalArgumentException e) {
+			//pass
+		}
+		
+		exAccount = new Pair<Object, String>("Test account.", "Test account.");
+		exAmountDue = new Pair<Object, String>(null, "");
+		exDateDue = new Pair<Object, String>(null, "");
+		exAmountPaid = new Pair<Object, String>(null, "");
+		exDatePaid = new Pair<Object, String>(null, "");
+		exConf = new Pair<Object, String>("", "");
+		
+		p = new Payment((String)exAccount.first);
+		assertEquals(exAccount.second, p.getAccount());
+		assertEquals(exAmountDue.second, p.getAmountDue());
+		assertEquals(exDateDue.second, p.getDueDate());
+		assertEquals(exAmountPaid.second, p.getAmountPaid());
+		assertEquals(exDatePaid.second, p.getTransferDate());
+		assertEquals(exConf.second, p.getConfirmation());
+		/** finished string constructors */
+		
+		exAccount = new Pair<Object, String>("Test account.", "Test account.");
+		exAmountDue = new Pair<Object, String>(3L, "3");
+		exDateDue = new Pair<Object, String>("2010-01-01", "Jan 1, 2010");
+		exAmountPaid = new Pair<Object, String>(2L, "2");
+		exDatePaid = new Pair<Object, String>("2011-02-01", "Feb 1, 2011");
+		exConf = new Pair<Object, String>("yes", "yes");
+
+		values.clear();
+		values.put(KnownCursor.ACCOUNT, exAccount.first);
+		values.put(KnownCursor.AMOUNT_DUE, exAmountDue.first);
+		values.put(KnownCursor.DATE_DUE, exDateDue.first);
+		values.put(KnownCursor.AMOUNT_PAID, exAmountPaid.first);
+		values.put(KnownCursor.DATE_XFER, exDatePaid.first);
+		values.put(KnownCursor.CONF, exConf.first);
+		
+		p = new Payment(new KnownCursor(values));
+		assertEquals(exAccount.second, p.getAccount());
+		assertEquals(exAmountDue.second, p.getAmountDue());
+		assertEquals(exDateDue.second, p.getDueDate());
+		assertEquals(exAmountPaid.second, p.getAmountPaid());
+		assertEquals(exDatePaid.second, p.getTransferDate());
+		assertEquals(exConf.second, p.getConfirmation());
+		
+		/** Test bad date form */
+		exAccount = new Pair<Object, String>("Test account.", "Test account.");
+		exAmountDue = new Pair<Object, String>(3L, "3");
+		exDateDue = new Pair<Object, String>("200-01-01", "");
+		exAmountPaid = new Pair<Object, String>(2L, "2");
+		exDatePaid = new Pair<Object, String>("2011-02-01", "Feb 1, 2011");
+		exConf = new Pair<Object, String>("yes", "yes");
+
+		values.clear();
+		values.put(KnownCursor.ACCOUNT, exAccount.first);
+		values.put(KnownCursor.AMOUNT_DUE, exAmountDue.first);
+		values.put(KnownCursor.DATE_DUE, exDateDue.first);
+		values.put(KnownCursor.AMOUNT_PAID, exAmountPaid.first);
+		values.put(KnownCursor.DATE_XFER, exDatePaid.first);
+		values.put(KnownCursor.CONF, exConf.first);
+
+		
+		p = new Payment(new KnownCursor("Test", 3L, "2010-01-02",
+				2L, "2010-01-01", "yes"));
+		assertEquals("Test", p.getAccount());
+		assertEquals("3", p.getAmountDue());
+		assertEquals("Jan 2, 2010", p.getDueDate());
+		assertEquals("2", p.getAmountPaid());
+		assertEquals("Jan 1, 2010", p.getTransferDate());
+		assertEquals("yes", p.getConfirmation());		
+		
+	}
+	
+	
+	private class KnownCursor extends MockCursor {
+		static final int ACCOUNT = 1;
+		static final int AMOUNT_DUE = 2;
+		static final int DATE_DUE = 3;
+		static final int AMOUNT_PAID = 4;
+		static final int DATE_XFER = 5;
+		static final int CONF = 6;
+		
+		private Object account;
+		private Object amountDue;
+		private Object dateDue;
+		private Object amountPaid;
+		private Object dateXfer;
+		private Object conf;
+
+		public KnownCursor(Object account, Object amountDue, Object dateDue, Object amountPaid, Object dateXfer, Object conf) {
+			this.account = account;
+			this.amountDue = amountDue;
+			this.dateDue = dateDue;
+			this.amountPaid = amountPaid;
+			this.dateXfer = dateXfer;
+			this.conf = conf;
+		}
+		
+		public KnownCursor(Map<Integer, Object> vals) {
+			this.account = vals.get(ACCOUNT);
+			this.amountDue = vals.get(AMOUNT_DUE);
+			this.dateDue = vals.get(DATE_DUE);
+			this.amountPaid = vals.get(AMOUNT_PAID);
+			this.dateXfer = vals.get(DATE_XFER);
+			this.conf = vals.get(CONF);
 		}
 
 		@Override
@@ -125,32 +172,54 @@ public class PaymentsTest extends AndroidTestCase {
 
 		@Override
 		public boolean isNull(int columnIndex) {
-			return false;
-		}
-
-		@Override
-		public long getLong(int columnIndex) {
-			switch (columnIndex) {
-				case AMOUNT_DUE:
-				case AMOUNT_PAID:
-				case DATE_DUE:
-				case DATE_XFER:
-					return longValue;
-				default:
-					return super.getLong(columnIndex);
+			switch(columnIndex) {
+			case ACCOUNT:
+				return account == null;
+			case AMOUNT_DUE:
+				return amountDue == null;
+			case AMOUNT_PAID:
+				return amountDue == null;
+			case DATE_DUE:
+				return dateDue == null;
+			case DATE_XFER:
+				return dateXfer == null;
+			case CONF:
+				return conf == null;
+			default:
+				return super.isNull(columnIndex);
 			}
 		}
 
 		@Override
 		public String getString(int columnIndex) {
-			switch (columnIndex) {
-				case ACCOUNT:
-				case CONF:
-					return stringValue;
-				default:
-					return super.getString(columnIndex);
+			switch(columnIndex) {
+			case ACCOUNT:
+				return (String)account;
+			case AMOUNT_DUE:
+				return (String)amountDue;
+			case AMOUNT_PAID:
+				return (String)amountDue;
+			case DATE_DUE:
+				return (String)dateDue;
+			case DATE_XFER:
+				return (String)dateXfer;
+			case CONF:
+				return (String)conf;
+			default:
+				return super.getString(columnIndex);
 			}
 		}
-
+		
+		@Override
+		public long getLong(int columnIndex) {
+			switch (columnIndex) {
+				case AMOUNT_DUE:
+					return (Long)amountDue;
+				case AMOUNT_PAID:
+					return (Long)amountPaid;
+				default:
+					return super.getLong(columnIndex);
+			}
+		}
 	}
 }
