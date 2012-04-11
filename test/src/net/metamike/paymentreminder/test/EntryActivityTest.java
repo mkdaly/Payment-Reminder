@@ -33,7 +33,8 @@ public class EntryActivityTest extends ActivityInstrumentationTestCase2<EntryAct
 		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.button_cancel));
 		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.button_save));
 		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_account));
-		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_amount));
+		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_amount_due));
+		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_amount_paid));
 		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_confirmation));
 		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_due_date));
 		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_pay_reminder));

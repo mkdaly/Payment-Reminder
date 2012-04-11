@@ -19,7 +19,7 @@ import android.text.format.Time;
 import android.util.Log;
 import android.util.TimeFormatException;
 
-public class PaymentDBAdapter {
+public final class PaymentDBAdapter {
 	private static final String TAG = "PaymentDBAdaper";
 	
 	private static final String DATABASE_NAME = "paymentreminder.db";
@@ -38,15 +38,17 @@ public class PaymentDBAdapter {
 	public static final String KEY_PAYMENT_ID = "payment_id";
 	public static final String KEY_TYPE = "type";
 	public static final String KEY_TIME = "time";
+
+	public static final String dateFormatString = "%Y%m%d";
 	
 	private static final String PAYMENTS_CREATE = 
 			"CREATE TABLE " + PAYMENTS_TABLE + " (" +
 			KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
 			KEY_ACCOUNT + " TEXT NOT NULL, " +
-			KEY_AMOUNT_DUE + " INTEGER DEFAULT 0, " +
-			KEY_AMOUNT_PAID + " INTEGER DEFAULT 0, " +
-			KEY_DATE_DUE + " DATE, " +
-			KEY_DATE_TRANSFER + " DATE, " +
+			KEY_AMOUNT_DUE + " INTEGER, " +
+			KEY_AMOUNT_PAID + " INTEGER, " +
+			KEY_DATE_DUE + " TEXT DEFAULT '', " +
+			KEY_DATE_TRANSFER + " TEXT DEFAULT '', " +
 			KEY_CONFIRMATION + " TEXT NOT NULL DEFAULT '');";
 
 	private static final String REMINDERS_CREATE = 
@@ -91,6 +93,7 @@ public class PaymentDBAdapter {
 	}
 	
 	//TODO: Provide feed back if account is null
+	/*
 	public boolean insertPayment(String account, Long amt_due, Long dt_due, Long amt_paid, Long dt_xfer, String conf) {
 		if (TextUtils.isEmpty(account))
 			return false; //Account needs to be *something*
@@ -108,21 +111,48 @@ public class PaymentDBAdapter {
 			values.put(KEY_CONFIRMATION, conf);
 		return database.insert(PAYMENTS_TABLE, null, values) > 0;
 	}
+	*/
+	
+	public boolean insertPayment(Payment p) {
+		return insertPayment(p.getAccount(), p.getAmountDueForDB(), p.getDueDateForDB(),
+				p.getAmountPaidForDB(), p.getTransferDateForDB(), p.getConfirmation());
+	}
+
+	boolean insertPayment(String account, Long amt_due, String dt_due, Long amt_paid, String dt_xfer, String conf) {
+		if (TextUtils.isEmpty(account))
+			return false; //Account needs to be *something*
+		ContentValues values = new ContentValues();
+		values.put(KEY_ACCOUNT, account);
+		if (amt_due != null)
+			values.put(KEY_AMOUNT_DUE, amt_due);
+		if (dt_due != null) 
+			values.put(KEY_DATE_DUE, dt_due);
+		if (amt_paid != null)
+			values.put(KEY_AMOUNT_PAID, amt_paid);
+		if (dt_xfer != null)
+			values.put(KEY_DATE_TRANSFER, dt_xfer);
+		if (conf != null)
+			values.put(KEY_CONFIRMATION, conf);
+		return database.insert(PAYMENTS_TABLE, null, values) > 0;
+	}
+
 
 	public boolean insertPayment(String account) {
+		if (TextUtils.isEmpty(account))
+			return false; //Account needs to be *something*
 		ContentValues values = new ContentValues();
 		values.put(KEY_ACCOUNT, account);
 		return database.insert(PAYMENTS_TABLE, null, values) > 0;
 	}
 
 	//TODO: Provide feed back to user if nulls are sent
-	public boolean insertReminder(Integer _id, ReminderType type, Date time) {
+	public boolean insertReminder(Integer _id, ReminderType type, String time) {
 		ContentValues values = new ContentValues();
 		values.put(KEY_PAYMENT_ID, _id);
 		if (type != null)
 			values.put(KEY_TYPE, type.ordinal());
 		if (time != null)
-			values.put(KEY_TIME, time.getTime());
+			values.put(KEY_TIME, time);
 		return database.insert(REMINDERS_TABLE, null, values) > 0;
 	}
 	
@@ -151,27 +181,7 @@ public class PaymentDBAdapter {
 		//TODO: Handle cases when src isn't a nice number
 		return null;
 	}
-	
-	/**
-	 * Parses a date in the form YYYY-MM-DD and returns the number
-	 * of milliseconds from the Unix epoch.
-	 * 
-	 * @param src
-	 * @return
-	 * @throws Exception
-	 */
-	public Long convertDateStringToMilliseconds(String src) throws TimeFormatException {
-		if (TextUtils.isEmpty(src))
-			return null;
-		Time t = new Time();
-		t.parse3339(src);
-		if (t.allDay)
-				return t.toMillis(false);
-		else
-			//throw TimeFormatException.class.newInstance();
-			return null;
-	}
-	
+		
 	private static class Helper extends SQLiteOpenHelper {
 		public Helper(Context c) {
 			super(c,DATABASE_NAME,null,DATABASE_VERSION);

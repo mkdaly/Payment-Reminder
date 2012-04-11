@@ -1,27 +1,31 @@
 package net.metamike.paymentreminder.test;
 
-import java.math.BigDecimal;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
+import net.metamike.paymentreminder.data.Payment;
 import net.metamike.paymentreminder.data.PaymentDBAdapter;
 import net.metamike.paymentreminder.data.PaymentDBAdapter.ReminderType;
-import net.metamike.paymentreminder.data.Payments;
+import net.metamike.paymentreminder.test.PaymentsTest.KnownCursor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 import android.test.RenamingDelegatingContext;
 import android.text.format.Time;
-import android.util.TimeFormatException;
 
-public class DBAdapterTest extends AndroidTestCase {
+public class PaymentDBAdapterTest extends AndroidTestCase {
 	private RenamingDelegatingContext testContext;
+	private Time now;
 
 	protected void setUp() throws Exception {
 		super.setUp();
-		testContext = new RenamingDelegatingContext(getContext(), "test_"); 
+		testContext = new RenamingDelegatingContext(getContext(), "test_");
+		now = new Time();
+		now.setToNow();
 	}
+	
 	
 	public void testOpen() {
 		MoreAsserts.assertEquals("Testing for no databases", new String[]{}, testContext.databaseList());
@@ -32,20 +36,30 @@ public class DBAdapterTest extends AndroidTestCase {
 	}
 	
 	public void testInserts() {
-		String account = "Test Account";
-		String amt_due = "40.00";
-		Date dt_due = new Date();
-		String amt_paid = "430.43";
-		Date dt_xfer = new Date();
-		String conf = "confirmed";
+		String exAccount = "Test Account";
+		Long exAmountDue = 40000L;
+		String exDateDue = now.format3339(true);
+		Long exAmountPaid = 430430L;
+		String exDatePaid = now.format3339(true);
+		String exConf = "confirmed";
+		Map<Integer, Object> values = new HashMap<Integer, Object>();
+		values.put(KnownCursor.ACCOUNT, exAccount);
+		values.put(KnownCursor.AMOUNT_DUE, exAmountDue);
+		values.put(KnownCursor.DATE_DUE, exDateDue);
+		values.put(KnownCursor.AMOUNT_PAID, exAmountPaid);
+		values.put(KnownCursor.DATE_XFER, exDatePaid);
+		values.put(KnownCursor.CONF, exConf);
+		values.put(KnownCursor.ID, Integer.valueOf(1));
+
+		Payment p = new Payment(new KnownCursor(values));
+
 		
 		PaymentDBAdapter adapter = new PaymentDBAdapter(testContext);
 		adapter.open();
 		SQLiteDatabase db = adapter.getDatabase();
 		
 		try {
-			assertTrue("Failed inserting payment.", adapter.insertPayment(
-				account, adapter.convertStringToLongMill(amt_due), dt_due.getTime(), adapter.convertStringToLongMill(amt_paid), dt_xfer.getTime(), conf));
+			assertTrue("Failed inserting payment.", adapter.insertPayment(p));
 		} catch  (Exception e) {
 			//TODO: Fix type when new ex type is written
 			fail(e.getMessage());
@@ -53,41 +67,41 @@ public class DBAdapterTest extends AndroidTestCase {
 		Cursor c = db.rawQuery("SELECT * FROM payments", null);
 		assertEquals(1, c.getCount());
 		assertTrue(c.moveToFirst());
-		assertEquals(account, Payments.getAccount(c));
-		assertEquals((Long)40000L, Payments.getAmountDue(c));
-		assertEquals((Long)dt_due.getTime(), Payments.getDueDateAsLong(c));
-		assertTrue(dt_due.equals(Payments.getDueDate(c)));
-		assertEquals((Long)430430L, Payments.getAmountPaid(c));
-		assertEquals((Long)dt_xfer.getTime(), Payments.getTransferDateAsLong(c));
-		assertTrue(dt_xfer.equals(Payments.getTransferDate(c)));
-		assertEquals(conf, Payments.getConfirmation(c));
+		assertEquals(exAccount, c.getString(c.getColumnIndex(PaymentDBAdapter.KEY_ACCOUNT)));
+		assertEquals(exAmountDue.longValue(), c.getLong(c.getColumnIndex(PaymentDBAdapter.KEY_AMOUNT_DUE)));
+		assertEquals(exDateDue, c.getString(c.getColumnIndex(PaymentDBAdapter.KEY_DATE_DUE)));
+		assertEquals(exAmountPaid.longValue(), c.getLong(c.getColumnIndex(PaymentDBAdapter.KEY_AMOUNT_PAID)));
+		assertEquals(exDatePaid, c.getString(c.getColumnIndex(PaymentDBAdapter.KEY_DATE_TRANSFER)));
+		assertEquals(exConf, c.getString(c.getColumnIndex(PaymentDBAdapter.KEY_CONFIRMATION)));
 		
 		int _id = c.getInt(c.getColumnIndex(PaymentDBAdapter.KEY_ID));
 		ReminderType type = ReminderType.PAY;
-		Date time = new Date();
+		String time = now.format3339(true);
 
 		c.close();
-		assertTrue("Failed inserting reminder.", adapter.insertReminder(
-				_id, type, time));
+		assertTrue("Failed inserting reminder.", adapter.insertReminder(_id, type, time));
 		c = db.rawQuery("SELECT * FROM reminders", null);
 		assertEquals(1, c.getCount());
 		assertTrue(c.moveToFirst());
 		assertEquals(_id, c.getInt(c.getColumnIndex(PaymentDBAdapter.KEY_PAYMENT_ID)));
 		assertEquals(type.ordinal(), c.getInt(c.getColumnIndex(PaymentDBAdapter.KEY_TYPE)));
-		assertEquals(time.getTime(), c.getLong(c.getColumnIndex(PaymentDBAdapter.KEY_TIME)));
+		assertEquals(time, c.getString(c.getColumnIndex(PaymentDBAdapter.KEY_TIME)));
 		c.close();
 		
-		assertTrue(adapter.insertPayment(account));
+		//assertTrue(adapter.insertPayment(account));
 
 	}
 
 	public void testInsertsConstraintsPayments() {
-		String account = "Test Account Constraints";
-		String amt_due = "40.00";
-		Date dt_due = new Date();
-		String amt_paid = "430.43";
-		Date dt_xfer = new Date();
-		String conf = "confirmed";
+		Map<Integer, Object> values = new HashMap<Integer, Object>();
+		values.put(KnownCursor.ACCOUNT, null);
+		values.put(KnownCursor.AMOUNT_DUE, null);
+		values.put(KnownCursor.DATE_DUE, null);
+		values.put(KnownCursor.AMOUNT_PAID, null);
+		values.put(KnownCursor.DATE_XFER, null);
+		values.put(KnownCursor.CONF, null);
+		values.put(KnownCursor.ID, null);
+		Payment p;
 		
 		PaymentDBAdapter adapter = new PaymentDBAdapter(testContext);
 		adapter.open();
@@ -95,24 +109,27 @@ public class DBAdapterTest extends AndroidTestCase {
 		
 		//Account needs to be specified
 		try {
-			assertFalse(adapter.insertPayment(null, adapter.convertStringToLongMill(amt_due), dt_due.getTime(), adapter.convertStringToLongMill(amt_paid), dt_xfer.getTime(), conf));
+			assertFalse(adapter.insertPayment((String)null));
 		} catch (Exception e) {
 			//TODO: Fix type when new ex type is written
 			fail(e.getMessage());
 		}
 		
+		values.put(KnownCursor.ACCOUNT, "Test Account");
+		values.put(KnownCursor.ID, Integer.valueOf(1));
+		p = new Payment(new KnownCursor(values));
+
 		//Nulls for these should use the DEFAULTs 
-		assertTrue("Succeeded inserting payment with null account.", adapter.insertPayment(
-				account, null, null, null, null, null));
+		assertTrue("Succeeded inserting payment with null account.", adapter.insertPayment(p));
 		
-		Cursor c = db.rawQuery("SELECT * FROM payments WHERE account = ?", new String[]{account});
+		Cursor c = db.rawQuery("SELECT * FROM payments WHERE account = ?", new String[]{"Test Account"});
 		assertEquals(1, c.getCount());
 		assertTrue(c.moveToFirst());
-		assertEquals(account, c.getString(c.getColumnIndex(PaymentDBAdapter.KEY_ACCOUNT)));
+		assertEquals("Test Account", c.getString(c.getColumnIndex(PaymentDBAdapter.KEY_ACCOUNT)));
 		assertEquals(0, c.getLong(c.getColumnIndex(PaymentDBAdapter.KEY_AMOUNT_DUE)));
-		assertTrue( c.isNull(c.getColumnIndex(PaymentDBAdapter.KEY_DATE_DUE)));
+		assertEquals("", c.getString(c.getColumnIndex(PaymentDBAdapter.KEY_DATE_DUE)));
 		assertEquals(0, c.getLong(c.getColumnIndex(PaymentDBAdapter.KEY_AMOUNT_PAID)));
-		assertTrue(c.isNull(c.getColumnIndex(PaymentDBAdapter.KEY_DATE_TRANSFER)));
+		assertEquals("", c.getString(c.getColumnIndex(PaymentDBAdapter.KEY_DATE_TRANSFER)));
 		assertEquals("", c.getString(c.getColumnIndex(PaymentDBAdapter.KEY_CONFIRMATION)));
 		c.close();		
 	}
@@ -133,7 +150,6 @@ public class DBAdapterTest extends AndroidTestCase {
 		c.close();
 		
 		ReminderType type = ReminderType.PAY;
-		Date time = new Date();
 
 		assertFalse(adapter.insertReminder(null, null, null));
 		assertFalse(adapter.insertReminder(_id, null, null));
@@ -161,51 +177,67 @@ public class DBAdapterTest extends AndroidTestCase {
 		}
 	}
 	
-	public void testConvertDateStringToMilliseconds() {
+	/*
+	public void testConvertStringToTime() {
 		PaymentDBAdapter adapter = new PaymentDBAdapter(testContext);
 		Time date = new Time();
-		date.set(1, 0, 2012); //Jan 1 2012
-		String dateString = "2012-01-01";
-		String datetimeString = "2012-01-01T16:00:00.000Z";
-		String badFormat = "Jan 01, 2012";
+		date.set(1, Calendar.JANUARY, 2012); //Jan 1 2012
+		String exDateString = "20120101";
+		String exDatetimeString = "20120101T160000";
+		String badFormat = "2012-01-01";
+		String badFormat2 = "Jan 01, 2012";
 		
 		try {
-			assertEquals((Long)date.toMillis(true), adapter.convertDateStringToMilliseconds(dateString));
-			assertNull(adapter.convertDateStringToMilliseconds(null));
-			assertNull(adapter.convertDateStringToMilliseconds(datetimeString));
+			assertTrue(0 == Time.compare(date, adapter.convertStringToTime(exDateString)));
+			assertTrue(0 == Time.compare(date, adapter.convertStringToTime(exDatetimeString)));
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
 		try {
-			assertNull(adapter.convertDateStringToMilliseconds(badFormat));
+			adapter.convertStringToTime(badFormat);
 			fail("Exception not thrown.");
 		} catch (TimeFormatException tfe) {
 			//ok.
 		}
+		try {
+			adapter.convertStringToTime(badFormat2);
+			fail("Exception not thrown.");
+		} catch (TimeFormatException tfe) {
+			//ok.
+		}
+
 	}
+	*/
 	
 	public void testGetAllPayments() {
 		PaymentDBAdapter adapter = new PaymentDBAdapter(testContext);
 		adapter.open();
 		Cursor c = adapter.getAllPayments();
 		assertEquals(0, c.getCount());
-		
+				
 		String[] expectedAccounts = {"Test 1", "Test 2", 
 				"Test 4", "Test 3"};
 		
-		Long[] expectedLongs = new Long[4];
+		String[] expectedDate = new String[4];
 		Time t = new Time();
 		t.set(1, Calendar.JANUARY, 2012);
-		expectedLongs[0] = Long.valueOf(t.toMillis(false));
+		expectedDate[0] = (new Time(t)).format3339(true);
 		t.set(1, Calendar.FEBRUARY, 2012);
-		expectedLongs[1] = Long.valueOf(t.toMillis(false));
+		expectedDate[1] = (new Time(t)).format3339(true);
 		t.set(1, Calendar.JUNE, 2012);
-		expectedLongs[2] = Long.valueOf(t.toMillis(false));		
+		expectedDate[2] = (new Time(t)).format3339(true);		
 		t.set(2, Calendar.JANUARY, 2012);
-		expectedLongs[3] = Long.valueOf(t.toMillis(false));
+		expectedDate[3] = (new Time(t)).format3339(true);
+		
+		Map<Integer, Object> values = new HashMap<Integer, Object>();
 		
 		for (int i = 0; i < expectedAccounts.length; i++) {
-			assertTrue(adapter.insertPayment(expectedAccounts[i], null, expectedLongs[i], null, null, null));
+			values.put(KnownCursor.ACCOUNT, expectedAccounts[i]);
+			values.put(KnownCursor.DATE_DUE, expectedDate[i]);
+			values.put(KnownCursor.ID, Integer.valueOf(i));
+
+			Payment p = new Payment(new KnownCursor(values));
+			assertTrue(adapter.insertPayment(p));
 		}
 		
 		c = adapter.getAllPayments();
@@ -213,8 +245,8 @@ public class DBAdapterTest extends AndroidTestCase {
 		int[] expectedOrder = {0, 3, 1, 2}; //Jan 1; Jan 2; Feb 1; Jun 1
 		c.moveToFirst();
 		for(Integer i: expectedOrder) {
-			assertEquals(expectedAccounts[i], Payments.getAccount(c));
-			assertEquals(expectedLongs[i], Payments.getDueDateAsLong(c));
+			assertEquals(expectedAccounts[i], c.getString(c.getColumnIndex(PaymentDBAdapter.KEY_ACCOUNT)));
+			assertEquals(expectedDate[i], c.getString(c.getColumnIndex(PaymentDBAdapter.KEY_DATE_DUE)));
 			if (!c.isLast())
 				assertTrue(c.moveToNext());
 		}
@@ -222,5 +254,4 @@ public class DBAdapterTest extends AndroidTestCase {
 		adapter.close();
 		
 	}
-
 }

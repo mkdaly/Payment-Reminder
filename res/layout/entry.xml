@@ -28,11 +28,23 @@
         android:text="@string/LABEL_AMOUNT_DUE"
         android:textAppearance="?android:attr/textAppearanceMedium" />
     <EditText
-        android:id="@+id/field_amount"
+        android:id="@+id/field_amount_due"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:inputType="numberDecimal" />
 
+    <TextView
+        android:id="@+id/label_amount_paid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/LABEL_AMOUNT_PAID"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+    <EditText
+        android:id="@+id/field_amount_paid"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal" />
+    
     <!-- Date Info -->
     <TextView
         android:id="@+id/label_date"

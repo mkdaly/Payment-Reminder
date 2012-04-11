@@ -4,6 +4,7 @@
 package net.metamike.paymentreminder.data;
 
 import android.database.Cursor;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.format.Time;
@@ -14,6 +15,8 @@ import android.util.TimeFormatException;
  *
  */
 public final class Payment {
+	private int recordID;
+	
 	// context.getResources().getConfiguration().locale
 	private String account;
 	private String conf;
@@ -39,6 +42,7 @@ public final class Payment {
 		amountPaid = null;
 		dayDue = null;		
 		dayXfer = null;
+		recordID = -1;
 	}
 	
 	public Payment(Cursor c) {
@@ -46,6 +50,7 @@ public final class Payment {
 		if (TextUtils.isEmpty(account))
 			throw new IllegalArgumentException("The value for account is empty.");
 		conf = c.getString(c.getColumnIndex(PaymentDBAdapter.KEY_CONFIRMATION));
+		recordID = c.getInt(c.getColumnIndex(PaymentDBAdapter.KEY_ID));
 		
 		amountDue = Payment.getLong(c, c.getColumnIndex(PaymentDBAdapter.KEY_AMOUNT_DUE));
 		amountPaid = Payment.getLong(c, c.getColumnIndex(PaymentDBAdapter.KEY_AMOUNT_PAID));
@@ -64,12 +69,47 @@ public final class Payment {
 		}
 	}
 	
+	public Payment(Bundle b){
+		account = b.getString(PaymentDBAdapter.KEY_ACCOUNT);
+		if (TextUtils.isEmpty(account))
+			throw new IllegalArgumentException("The value for account is empty.");
+		conf = b.getString(PaymentDBAdapter.KEY_CONFIRMATION);
+		recordID = -1;
+		
+		amountDue = Long.valueOf(b.getString(PaymentDBAdapter.KEY_AMOUNT_DUE));
+		amountPaid = Long.valueOf(b.getString(PaymentDBAdapter.KEY_AMOUNT_PAID));
+
+		try {
+			dayDue = new Time();  
+			dayDue.parse3339(b.getString(PaymentDBAdapter.KEY_DATE_DUE));
+		} catch (TimeFormatException tfe) {
+			dayDue = null;
+		}
+		try {
+			dayXfer = new Time();
+			dayXfer.parse3339(b.getString(PaymentDBAdapter.KEY_DATE_TRANSFER));
+		} catch (TimeFormatException tfe) {
+			dayXfer = null;
+		}
+
+		
+	}
+	
 	private static Long getLong(Cursor c, int column) {
 		return (c.isNull(column)) ? null : Long.valueOf(c.getLong(column));
 	}
 		
 	private static String getString(Cursor c, int column) {		
 		return c.isNull(column) ? "" : c.getString(column);
+	}
+	
+	int getRecordID() throws NoSuchFieldException {
+		if (recordID > 0) {
+			return recordID;
+		} else {
+			throw new NoSuchFieldException("There is no record ID established for this payment.");
+		}
+		
 	}
 	
 	public String getAccount() {
@@ -110,7 +150,8 @@ public final class Payment {
 	 *  {@link DateUtils.FORMAT_ABBREV_ALL} format, else the emppty string.  
 	 */
 	public String getDueDate() {
-		return dayDue == null ? "" : DateUtils.formatDateTime(null, dayDue.toMillis(false), formatFlags);
+		return dayDue == null ? "" : dayDue.format3339(true);
+		//return dayDue == null ? "" : DateUtils.formatDateTime(null, dayDue.toMillis(false), formatFlags);
 	}
 	
 	String getDueDateForDB() {
@@ -125,7 +166,8 @@ public final class Payment {
 	 *  {@link DateUtils.FORMAT_ABBREV_ALL} format, else the empty string.  
 	 */
 	public String getTransferDate() {
-		return dayXfer == null ? "" : DateUtils.formatDateTime(null, dayXfer.toMillis(false), formatFlags);
+		return dayXfer == null ? "" : dayXfer.format3339(true);
+		//return dayXfer == null ? "" : DateUtils.formatDateTime(null, dayXfer.toMillis(false), formatFlags);
 	}
 	
 	String getTransferDateForDB() {

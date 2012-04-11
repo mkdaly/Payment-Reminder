@@ -1,7 +1,7 @@
 package net.metamike.paymentreminder;
 
 import net.metamike.paymentreminder.data.PaymentDBAdapter;
-import net.metamike.paymentreminder.data.Payments;
+import net.metamike.paymentreminder.data.Payment;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -66,12 +66,12 @@ public class ListActivity extends Activity {
 	//TODO:
 	private Bundle populateBundle(Cursor c) {
 		Bundle b = new Bundle();
-		b.putString(PaymentDBAdapter.KEY_ACCOUNT, Payments.getAccount(c));
-		b.putLong(PaymentDBAdapter.KEY_DATE_DUE, Payments.getDueDateAsLong(c));
-		b.putLong(PaymentDBAdapter.KEY_AMOUNT_PAID, Payments.getAmountPaid(c));
-		//TODO: doesn't like nulls. probably need to create a DAO
-		b.putLong(PaymentDBAdapter.KEY_DATE_TRANSFER, Payments.getTransferDateAsLong(c));
-		b.putString(PaymentDBAdapter.KEY_CONFIRMATION, Payments.getConfirmation(c));
+		Payment p = new Payment(c);
+		b.putString(PaymentDBAdapter.KEY_ACCOUNT, p.getAccount());
+		b.putString(PaymentDBAdapter.KEY_DATE_DUE, p.getDueDate());
+		b.putString(PaymentDBAdapter.KEY_AMOUNT_PAID, p.getAmountPaid());
+		b.putString(PaymentDBAdapter.KEY_DATE_TRANSFER, p.getTransferDate());
+		b.putString(PaymentDBAdapter.KEY_CONFIRMATION, p.getConfirmation());
 		//TODO: the rest
 		return b;
 	}

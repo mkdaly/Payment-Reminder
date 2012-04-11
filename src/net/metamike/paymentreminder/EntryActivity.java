@@ -3,9 +3,11 @@ package net.metamike.paymentreminder;
 import java.math.BigDecimal;
 import java.util.Date;
 
+import net.metamike.paymentreminder.data.Payment;
 import net.metamike.paymentreminder.data.PaymentDBAdapter;
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.format.Time;
 import android.util.TimeFormatException;
 import android.view.View;
 import android.widget.Button;
@@ -18,6 +20,7 @@ public class EntryActivity extends Activity {
 	private EditText accountField;
 	private EditText amountDueField;
 	private EditText dueDateField;
+	private EditText amountPaidField;
 	private EditText transferDateField;
 	private EditText confirmationField;
 	//TODO:
@@ -40,8 +43,9 @@ public class EntryActivity extends Activity {
         dbAdapter.open();
         
         accountField = (EditText)findViewById(R.id.field_account);
-        amountDueField = (EditText)findViewById(R.id.field_amount);
+        amountDueField = (EditText)findViewById(R.id.field_amount_due);
         dueDateField = (EditText)findViewById(R.id.field_due_date);
+        amountPaidField = (EditText)findViewById(R.id.field_amount_paid);
         transferDateField = (EditText)findViewById(R.id.field_transfer_date);
         confirmationField = (EditText)findViewById(R.id.field_confirmation);
         
@@ -58,46 +62,21 @@ public class EntryActivity extends Activity {
     	accountField.getText().clear();
     	amountDueField.getText().clear();
     	dueDateField.getText().clear();
+    	amountPaidField.getText().clear();
     	transferDateField.getText().clear();
     	confirmationField.getText().clear();
     	accountField.requestFocus();
     }
     
     private void saveEntry(View button) {
-    	String account = accountField.getText().toString();
-    	Boolean error = Boolean.FALSE;
-    	//TODO: Should an empty string be allowed
-    	if (account == null) {
-    		//TODO: show dialog
-    		return;
-    	}
-    	Long amt_due = null;
-    	Long dt_due = null;
-    	try {
-			 amt_due = dbAdapter.convertStringToLongMill(amountDueField.getText().toString());
-			 dt_due = dbAdapter.convertDateStringToMilliseconds(dueDateField.getText().toString());
-		} catch (NumberFormatException nfe) {
-			// TODO: Show Dialog
-			nfe.printStackTrace();
-			error = Boolean.TRUE;
-		} catch (TimeFormatException tfe) {
-			// TODO: Show Dialog
-			tfe.printStackTrace();
-			error = Boolean.TRUE;
-		}
-    	
-    	Long dt_xfer= null;
-    	try {
-			 dt_xfer = dbAdapter.convertDateStringToMilliseconds(transferDateField.getText().toString());
-		} catch (TimeFormatException tfe) {
-			// TODO: Show Dialog
-			tfe.printStackTrace();
-			error = Boolean.TRUE;
-		}
-    	if (!error) {
-    		String conf = confirmationField.getText().toString();
-    		dbAdapter.insertPayment(account, amt_due, dt_due, null, dt_xfer, conf);
-    	}
+    	Bundle b = new Bundle();
+    	b.putString(PaymentDBAdapter.KEY_ACCOUNT, accountField.getText().toString());
+		b.putString(PaymentDBAdapter.KEY_AMOUNT_DUE, amountDueField.getText().toString());
+		b.putString(PaymentDBAdapter.KEY_DATE_DUE, dueDateField.getText().toString());
+		b.putString(PaymentDBAdapter.KEY_AMOUNT_PAID, amountPaidField.getText().toString());
+		b.putString(PaymentDBAdapter.KEY_DATE_TRANSFER, transferDateField.getText().toString());
+		b.putString(PaymentDBAdapter.KEY_CONFIRMATION, confirmationField.getText().toString());
+    	dbAdapter.insertPayment(new Payment(b));
     }
 
 	@Override
