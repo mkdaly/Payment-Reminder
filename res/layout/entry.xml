@@ -1,147 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/entryView"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:stretchColumns="*">
-	<!-- Account Info  -->
-    <TextView
-        android:id="@+id/label_account"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/LABEL_ACCOUNT"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-    <EditText
-        android:id="@+id/field_account"
+    android:layout_height="fill_parent" >
+
+    <ScrollView
+        android:id="@+id/contentView"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="text">
+        android:layout_height="fill_parent"
+        android:layout_above="@+id/buttonsView"
+        android:isScrollContainer="true"
+        android:scrollbarStyle="insideInset" >
+        
+        <TableLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/entryView"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:stretchColumns="*" >
 
-        <requestFocus />
-    </EditText>
+            <!-- Account Info -->
+            <TextView
+                android:id="@+id/label_account"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/LABEL_ACCOUNT"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <EditText
+                android:id="@+id/field_account"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text" >
+                <requestFocus />
+            </EditText>
 
-    <!-- Amount Info -->
-    <TextView
-        android:id="@+id/label_amount_due"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/LABEL_AMOUNT_DUE"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-    <EditText
-        android:id="@+id/field_amount_due"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="numberDecimal" />
+            <!-- Amount Info -->
+            <TextView
+                android:id="@+id/label_amount_due"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/LABEL_AMOUNT_DUE"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <EditText
+                android:id="@+id/field_amount_due"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
 
-    <TextView
-        android:id="@+id/label_amount_paid"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/LABEL_AMOUNT_PAID"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-    <EditText
-        android:id="@+id/field_amount_paid"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="numberDecimal" />
-    
-    <!-- Date Info -->
-    <TextView
-        android:id="@+id/label_date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/LABEL_DATES"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-	<TableRow> 
-    	<TextView
-	        android:id="@+id/label_due_date"
-    	    android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:text="@string/LABEL_DUE"
-        	android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TextView
+                android:id="@+id/label_amount_paid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/LABEL_AMOUNT_PAID"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <EditText
+                android:id="@+id/field_amount_paid"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal" />
 
-    	<TextView
-        	android:id="@+id/label_transfer_date"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-    	    android:text="@string/LABEL_TRANSFER"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	</TableRow>
-	<TableRow>
-	    <EditText
-	        android:id="@+id/field_due_date"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:inputType="date" />
-	
-	    <EditText
-	        android:id="@+id/field_transfer_date"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:inputType="date" />
-	</TableRow>
+            <!-- Date Info -->
+            <TextView
+                android:id="@+id/label_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/LABEL_DATES"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TableRow>
+                <TextView
+                    android:id="@+id/label_due_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/LABEL_DUE"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                <TextView
+                    android:id="@+id/label_transfer_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/LABEL_TRANSFER"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </TableRow>
+            <TableRow>
+                <EditText
+                    android:id="@+id/field_due_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="date" />
+                <EditText
+                    android:id="@+id/field_transfer_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="date" />
+            </TableRow>
 
-	<!-- Reminders Info -->
-    <TextView
-        android:id="@+id/label_reminders"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/LABEL_REMINDERS"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
-    <TableRow>
-	    <TextView
-	        android:id="@+id/label_due_reminder"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/LABEL_DUE"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	
-	    <TextView
-	        android:id="@+id/label_transfer_reminder"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/LABEL_TRANSFER"
-	        android:textAppearance="?android:attr/textAppearanceMedium" />
-	</TableRow>
-	<TableRow>
-	    <EditText
-	        android:id="@+id/field_pay_reminder"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:inputType="date" />
-	
-	    <EditText
-	        android:id="@+id/field_transfer_reminder"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:inputType="date" />
-	</TableRow>
-	
-    <!-- Confirmation -->
-    <TextView
-        android:id="@+id/label_confirmation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/LABEL_CONFIRMATION"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+            <!-- Reminders Info -->
+            <TextView
+                android:id="@+id/label_reminders"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/LABEL_REMINDERS"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <TableRow>
+                <TextView
+                    android:id="@+id/label_due_reminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/LABEL_DUE"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                <TextView
+                    android:id="@+id/label_transfer_reminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/LABEL_TRANSFER"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+            </TableRow>
+            <TableRow>
+                <EditText
+                    android:id="@+id/field_pay_reminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="date" />
+                <EditText
+                    android:id="@+id/field_transfer_reminder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="date" />
+            </TableRow>
 
-    <EditText
-        android:id="@+id/field_confirmation"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"/>
+            <!-- Confirmation -->
+            <TextView
+                android:id="@+id/label_confirmation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/LABEL_CONFIRMATION"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            <EditText
+                android:id="@+id/field_confirmation"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content" />
+        </TableLayout>
+    </ScrollView>
 
     <!-- Actions -->
-    <TableRow>
-	    <Button
-	        android:id="@+id/button_save"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/LABEL_SAVE" />
-	
-	    <Button
-	        android:id="@+id/button_cancel"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:text="@string/LABEL_CANCEL" />
-	</TableRow>
-</TableLayout>
+    <LinearLayout
+        android:id="@+id/buttonsView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:weightSum="1.0">
+        <Button
+            android:id="@+id/button_save"
+            android:layout_weight=".5"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/LABEL_SAVE" />
+        <Button
+            android:id="@+id/button_cancel"
+            android:layout_weight=".5"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/LABEL_CANCEL" />
+    </LinearLayout>
+
+</RelativeLayout>
