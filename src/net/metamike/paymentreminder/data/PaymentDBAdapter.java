@@ -114,11 +114,11 @@ public final class PaymentDBAdapter {
 	*/
 	
 	public boolean insertPayment(Payment p) {
-		return insertPayment(p.getAccount(), p.getAmountDueForDB(), p.getDueDateForDB(),
-				p.getAmountPaidForDB(), p.getTransferDateForDB(), p.getConfirmation());
+		return insertPayment(p.getRecordID(), p.getAccount(), p.getAmountDueForDB(), p.getDueDateForDB(),
+				p.getAmountPaidForDB(), p.getTransferDateForDB(), p.getConfirmation());		
 	}
 
-	boolean insertPayment(String account, Long amt_due, String dt_due, Long amt_paid, String dt_xfer, String conf) {
+	boolean insertPayment(Long _id, String account, Long amt_due, String dt_due, Long amt_paid, String dt_xfer, String conf) {
 		if (TextUtils.isEmpty(account))
 			return false; //Account needs to be *something*
 		ContentValues values = new ContentValues();
@@ -133,9 +133,12 @@ public final class PaymentDBAdapter {
 			values.put(KEY_DATE_TRANSFER, dt_xfer);
 		if (conf != null)
 			values.put(KEY_CONFIRMATION, conf);
-		return database.insert(PAYMENTS_TABLE, null, values) > 0;
+		if (_id == Payment.NO_ID) {
+			return database.insert(PAYMENTS_TABLE, null, values) > 0;
+		} else {
+			return database.update(PAYMENTS_TABLE, values, KEY_ID + "= ?", new String[]{_id.toString()}) > 0;
+		}
 	}
-
 
 	public boolean insertPayment(String account) {
 		if (TextUtils.isEmpty(account))

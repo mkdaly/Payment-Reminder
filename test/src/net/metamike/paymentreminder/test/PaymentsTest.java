@@ -59,15 +59,17 @@ public class PaymentsTest extends AndroidTestCase {
 		exAmountPaid = new Pair<Object, String>(null, "");
 		exDatePaid = new Pair<Object, String>(null, "");
 		exConf = new Pair<Object, String>("", "");
-		exID = new Pair<Object, String>(Integer.valueOf(1), "1");
+		exID = new Pair<Object, String>(Payment.NO_ID.toString(), Payment.NO_ID.toString());
 		
 		p = new Payment((String)exAccount.first);
-		assertEquals(exAccount.second, p.getAccount());
-		assertEquals(exAmountDue.second, p.getAmountDue());
-		assertEquals(exDateDue.second, p.getDueDate());
-		assertEquals(exAmountPaid.second, p.getAmountPaid());
-		assertEquals(exDatePaid.second, p.getTransferDate());
-		assertEquals(exConf.second, p.getConfirmation());
+		Bundle b = p.generateBundle();
+		assertEquals(exAccount.second, b.getString(PaymentDBAdapter.KEY_ACCOUNT));
+		assertEquals(exAmountDue.second, b.getString(PaymentDBAdapter.KEY_AMOUNT_DUE));
+		assertEquals(exDateDue.second, b.getString(PaymentDBAdapter.KEY_DATE_DUE));
+		assertEquals(exAmountPaid.second, b.getString(PaymentDBAdapter.KEY_AMOUNT_PAID));
+		assertEquals(exDatePaid.second, b.getString(PaymentDBAdapter.KEY_DATE_TRANSFER));
+		assertEquals(exConf.second, b.getString(PaymentDBAdapter.KEY_CONFIRMATION));
+		assertEquals(exID.second, b.getString(PaymentDBAdapter.KEY_ID));
 		/** finished string constructors */
 	}
 	
@@ -95,7 +97,7 @@ public class PaymentsTest extends AndroidTestCase {
 		exAmountPaid = new Pair<Object, String>(2L, "2");
 		exDatePaid = new Pair<Object, String>("2011-02-01", "2011-02-01");
 		exConf = new Pair<Object, String>("yes", "yes");
-		exID = new Pair<Object, String>(Integer.valueOf(1), "1");
+		exID = new Pair<Object, String>(Long.valueOf(1), "1");
 
 		values.clear();
 		values.put(KnownCursor.ACCOUNT, exAccount.first);
@@ -107,12 +109,14 @@ public class PaymentsTest extends AndroidTestCase {
 		values.put(KnownCursor.ID, exID.first);
 		
 		p = new Payment(new KnownCursor(values));
-		assertEquals(exAccount.second, p.getAccount());
-		assertEquals(exAmountDue.second, p.getAmountDue());
-		assertEquals(exDateDue.second, p.getDueDate());
-		assertEquals(exAmountPaid.second, p.getAmountPaid());
-		assertEquals(exDatePaid.second, p.getTransferDate());
-		assertEquals(exConf.second, p.getConfirmation());
+		Bundle b = p.generateBundle();		
+		assertEquals(exAccount.second, b.getString(PaymentDBAdapter.KEY_ACCOUNT));
+		assertEquals(exAmountDue.second, b.getString(PaymentDBAdapter.KEY_AMOUNT_DUE));
+		assertEquals(exDateDue.second, b.getString(PaymentDBAdapter.KEY_DATE_DUE));
+		assertEquals(exAmountPaid.second, b.getString(PaymentDBAdapter.KEY_AMOUNT_PAID));
+		assertEquals(exDatePaid.second, b.getString(PaymentDBAdapter.KEY_DATE_TRANSFER));
+		assertEquals(exConf.second, b.getString(PaymentDBAdapter.KEY_CONFIRMATION));
+		assertEquals(exID.second, b.getString(PaymentDBAdapter.KEY_ID));
 		
 		
 		/** Test bad date form */
@@ -122,6 +126,7 @@ public class PaymentsTest extends AndroidTestCase {
 		exAmountPaid = new Pair<Object, String>(2L, "2");
 		exDatePaid = new Pair<Object, String>("2011-02-01", "2011-02-01");
 		exConf = new Pair<Object, String>("yes", "yes");
+		exID = new Pair<Object, String>(Long.valueOf(1), "1");
 
 		values.clear();
 		values.put(KnownCursor.ACCOUNT, exAccount.first);
@@ -131,17 +136,26 @@ public class PaymentsTest extends AndroidTestCase {
 		values.put(KnownCursor.DATE_XFER, exDatePaid.first);
 		values.put(KnownCursor.CONF, exConf.first);
 		values.put(KnownCursor.ID, exID.first);
-
+		p = new Payment(new KnownCursor(values));
+		b = p.generateBundle();
+		assertEquals(exAccount.second, b.getString(PaymentDBAdapter.KEY_ACCOUNT));
+		assertEquals(exAmountDue.second, b.getString(PaymentDBAdapter.KEY_AMOUNT_DUE));
+		assertEquals(exDateDue.second, b.getString(PaymentDBAdapter.KEY_DATE_DUE));
+		assertEquals(exAmountPaid.second, b.getString(PaymentDBAdapter.KEY_AMOUNT_PAID));
+		assertEquals(exDatePaid.second, b.getString(PaymentDBAdapter.KEY_DATE_TRANSFER));
+		assertEquals(exConf.second, b.getString(PaymentDBAdapter.KEY_CONFIRMATION));
+		assertEquals(exID.second, b.getString(PaymentDBAdapter.KEY_ID));
 		
 		p = new Payment(new KnownCursor("Test", 3L, "2010-01-02",
-				2L, "2010-01-01", "yes", 1));
-		assertEquals("Test", p.getAccount());
-		assertEquals("3", p.getAmountDue());
-		assertEquals("2010-01-02", p.getDueDate());
-		assertEquals("2", p.getAmountPaid());
-		assertEquals("2010-01-01", p.getTransferDate());
-		assertEquals("yes", p.getConfirmation());		
-		
+				2L, "2010-01-01", "yes", 1L));
+		b = p.generateBundle();
+		assertEquals("Test", b.getString(PaymentDBAdapter.KEY_ACCOUNT));
+		assertEquals("3", b.getString(PaymentDBAdapter.KEY_AMOUNT_DUE));
+		assertEquals("2010-01-02", b.getString(PaymentDBAdapter.KEY_DATE_DUE));
+		assertEquals("2", b.getString(PaymentDBAdapter.KEY_AMOUNT_PAID));
+		assertEquals("2010-01-01", b.getString(PaymentDBAdapter.KEY_DATE_TRANSFER));
+		assertEquals("yes", b.getString(PaymentDBAdapter.KEY_CONFIRMATION));
+		assertEquals("1", b.getString(PaymentDBAdapter.KEY_ID));		
 	}
 	
 	public void testBundleConstructor() {
@@ -152,6 +166,7 @@ public class PaymentsTest extends AndroidTestCase {
 		b.putString(PaymentDBAdapter.KEY_AMOUNT_PAID, null);
 		b.putString(PaymentDBAdapter.KEY_DATE_TRANSFER, null);
 		b.putString(PaymentDBAdapter.KEY_CONFIRMATION, null);
+		b.putString(PaymentDBAdapter.KEY_ID, null);
 
 		/* Test null account */
 		try {
@@ -168,6 +183,7 @@ public class PaymentsTest extends AndroidTestCase {
 		exAmountPaid = new Pair<Object, String>("2", "2");
 		exDatePaid = new Pair<Object, String>("2011-02-01", "2011-02-01");
 		exConf = new Pair<Object, String>("yes", "yes");
+		exID = new Pair<Object, String>("2", "2");
 
 		b = new Bundle();
 		b.putString(PaymentDBAdapter.KEY_ACCOUNT, (String)exAccount.first);
@@ -176,15 +192,17 @@ public class PaymentsTest extends AndroidTestCase {
 		b.putString(PaymentDBAdapter.KEY_AMOUNT_PAID, (String)exAmountPaid.first);
 		b.putString(PaymentDBAdapter.KEY_DATE_TRANSFER, (String)exDatePaid.first);
 		b.putString(PaymentDBAdapter.KEY_CONFIRMATION, (String)exConf.first);
+		b.putString(PaymentDBAdapter.KEY_ID, (String)exID.first);
 		
 		p = new Payment(b);
-		assertEquals(exAccount.second, p.getAccount());
-		assertEquals(exAmountDue.second, p.getAmountDue());
-		assertEquals(exDateDue.second, p.getDueDate());
-		assertEquals(exAmountPaid.second, p.getAmountPaid());
-		assertEquals(exDatePaid.second, p.getTransferDate());
-		assertEquals(exConf.second, p.getConfirmation());
-		
+		b = p.generateBundle();
+		assertEquals(exAccount.second, b.getString(PaymentDBAdapter.KEY_ACCOUNT));
+		assertEquals(exAmountDue.second, b.getString(PaymentDBAdapter.KEY_AMOUNT_DUE));
+		assertEquals(exDateDue.second, b.getString(PaymentDBAdapter.KEY_DATE_DUE));
+		assertEquals(exAmountPaid.second, b.getString(PaymentDBAdapter.KEY_AMOUNT_PAID));
+		assertEquals(exDatePaid.second, b.getString(PaymentDBAdapter.KEY_DATE_TRANSFER));
+		assertEquals(exConf.second, b.getString(PaymentDBAdapter.KEY_CONFIRMATION));
+		assertEquals(exID.second, b.getString(PaymentDBAdapter.KEY_ID));		
 		
 		/** Test bad date form */
 		exAccount = new Pair<Object, String>("Test account.", "Test account.");
@@ -193,6 +211,7 @@ public class PaymentsTest extends AndroidTestCase {
 		exAmountPaid = new Pair<Object, String>("2", "2");
 		exDatePaid = new Pair<Object, String>("2011-02-01", "2011-02-01");
 		exConf = new Pair<Object, String>("yes", "yes");
+		exID = new Pair<Object, String>("2", "2");
 
 		b = new Bundle();
 		b.putString(PaymentDBAdapter.KEY_ACCOUNT, (String)exAccount.first);
@@ -201,17 +220,103 @@ public class PaymentsTest extends AndroidTestCase {
 		b.putString(PaymentDBAdapter.KEY_AMOUNT_PAID, (String)exAmountPaid.first);
 		b.putString(PaymentDBAdapter.KEY_DATE_TRANSFER, (String)exDatePaid.first);
 		b.putString(PaymentDBAdapter.KEY_CONFIRMATION, (String)exConf.first);
-
+		b.putString(PaymentDBAdapter.KEY_ID, (String)exID.first);
 		
 		p = new Payment(b);
-		assertEquals(exAccount.second, p.getAccount());
-		assertEquals(exAmountDue.second, p.getAmountDue());
-		assertEquals(exDateDue.second, p.getDueDate());
-		assertEquals(exAmountPaid.second, p.getAmountPaid());
-		assertEquals(exDatePaid.second, p.getTransferDate());
-		assertEquals(exConf.second, p.getConfirmation());		
+		b = p.generateBundle();
+		assertEquals(exAccount.second, b.getString(PaymentDBAdapter.KEY_ACCOUNT));
+		assertEquals(exAmountDue.second, b.getString(PaymentDBAdapter.KEY_AMOUNT_DUE));
+		assertEquals(exDateDue.second, b.getString(PaymentDBAdapter.KEY_DATE_DUE));
+		assertEquals(exAmountPaid.second, b.getString(PaymentDBAdapter.KEY_AMOUNT_PAID));
+		assertEquals(exDatePaid.second, b.getString(PaymentDBAdapter.KEY_DATE_TRANSFER));
+		assertEquals(exConf.second, b.getString(PaymentDBAdapter.KEY_CONFIRMATION));
+		assertEquals(exID.second, b.getString(PaymentDBAdapter.KEY_ID));
 		
+		/** Test bad Long values */
+		exAccount = new Pair<Object, String>("Test account.", "Test account.");
+		exAmountDue = new Pair<Object, String>("", "");
+		exDateDue = new Pair<Object, String>("200-01-01", "");
+		exAmountPaid = new Pair<Object, String>(null, "");
+		exDatePaid = new Pair<Object, String>("2011-02-01", "2011-02-01");
+		exConf = new Pair<Object, String>("yes", "yes");
+		exID = new Pair<Object, String>("2", "2");
+
+		b = new Bundle();
+		b.putString(PaymentDBAdapter.KEY_ACCOUNT, (String)exAccount.first);
+		b.putString(PaymentDBAdapter.KEY_AMOUNT_DUE, (String)exAmountDue.first);
+		b.putString(PaymentDBAdapter.KEY_DATE_DUE, (String)exDateDue.first);
+		b.putString(PaymentDBAdapter.KEY_AMOUNT_PAID, (String)exAmountPaid.first);
+		b.putString(PaymentDBAdapter.KEY_DATE_TRANSFER, (String)exDatePaid.first);
+		b.putString(PaymentDBAdapter.KEY_CONFIRMATION, (String)exConf.first);
+		b.putString(PaymentDBAdapter.KEY_ID, (String)exID.first);
 		
+		p = new Payment(b);
+		b = p.generateBundle();
+		assertEquals(exAccount.second, b.getString(PaymentDBAdapter.KEY_ACCOUNT));
+		assertEquals(exAmountDue.second, b.getString(PaymentDBAdapter.KEY_AMOUNT_DUE));
+		assertEquals(exDateDue.second, b.getString(PaymentDBAdapter.KEY_DATE_DUE));
+		assertEquals(exAmountPaid.second, b.getString(PaymentDBAdapter.KEY_AMOUNT_PAID));
+		assertEquals(exDatePaid.second, b.getString(PaymentDBAdapter.KEY_DATE_TRANSFER));
+		assertEquals(exConf.second, b.getString(PaymentDBAdapter.KEY_CONFIRMATION));
+		assertEquals(exID.second, b.getString(PaymentDBAdapter.KEY_ID));
+
+		
+		/** Test record ID */
+		exAccount = new Pair<Object, String>("Test account.", "Test account.");
+		exID = new Pair<Object, String>("", Payment.NO_ID.toString());
+
+		b = new Bundle();
+		b.putString(PaymentDBAdapter.KEY_ACCOUNT, (String)exAccount.first);
+		b.putString(PaymentDBAdapter.KEY_ID, (String)exID.first);
+		
+		p = new Payment(b);
+		b = p.generateBundle();
+		assertEquals(exAccount.second, b.getString(PaymentDBAdapter.KEY_ACCOUNT));
+		assertEquals(exID.second, b.getString(PaymentDBAdapter.KEY_ID));
+
+		
+		exAccount = new Pair<Object, String>("Test account.", "Test account.");
+		exID = new Pair<Object, String>("5", "5");
+
+		b = new Bundle();
+		b.putString(PaymentDBAdapter.KEY_ACCOUNT, (String)exAccount.first);
+		b.putString(PaymentDBAdapter.KEY_ID, (String)exID.first);
+		
+		p = new Payment(b);
+		b = p.generateBundle();
+		assertEquals(exAccount.second, b.getString(PaymentDBAdapter.KEY_ACCOUNT));
+		assertEquals(exID.second, b.getString(PaymentDBAdapter.KEY_ID));
+
+		
+	}
+	
+	public void testGenerateBundle() {
+		exAccount = new Pair<Object, String>("Test account.", "Test account.");
+		exAmountDue = new Pair<Object, String>(3L, "3");
+		exDateDue = new Pair<Object, String>("2010-01-01", "2010-01-01");
+		exAmountPaid = new Pair<Object, String>(2L, "2");
+		exDatePaid = new Pair<Object, String>("2011-02-01", "2011-02-01");
+		exConf = new Pair<Object, String>("yes", "yes");
+		exID = new Pair<Object, String>(Long.valueOf(1), "1");
+
+		values.clear();
+		values.put(KnownCursor.ACCOUNT, exAccount.first);
+		values.put(KnownCursor.AMOUNT_DUE, exAmountDue.first);
+		values.put(KnownCursor.DATE_DUE, exDateDue.first);
+		values.put(KnownCursor.AMOUNT_PAID, exAmountPaid.first);
+		values.put(KnownCursor.DATE_XFER, exDatePaid.first);
+		values.put(KnownCursor.CONF, exConf.first);
+		values.put(KnownCursor.ID, exID.first);
+		
+		Payment p = new Payment(new KnownCursor(values));
+		Bundle b = p.generateBundle();
+		assertEquals(b.getString(PaymentDBAdapter.KEY_ACCOUNT), exAccount.second);
+		assertEquals(b.getString(PaymentDBAdapter.KEY_AMOUNT_DUE), exAmountDue.second);
+		assertEquals(b.getString(PaymentDBAdapter.KEY_DATE_DUE), exDateDue.second);
+		assertEquals(b.getString(PaymentDBAdapter.KEY_AMOUNT_PAID), exAmountPaid.second);
+		assertEquals(b.getString(PaymentDBAdapter.KEY_DATE_TRANSFER), exDatePaid.second);
+		assertEquals(b.getString(PaymentDBAdapter.KEY_CONFIRMATION), exConf.second);
+		assertEquals(b.getString(PaymentDBAdapter.KEY_ID), exID.second);
 	}
 	
 	
@@ -320,18 +425,10 @@ public class PaymentsTest extends AndroidTestCase {
 					return (Long)amountDue;
 				case AMOUNT_PAID:
 					return (Long)amountPaid;
+				case ID:
+					return (Long)id;
 				default:
 					return super.getLong(columnIndex);
-			}
-		}
-		
-		@Override
-		public int getInt(int columnIndex) {
-			switch (columnIndex) {
-				case ID:
-					return (Integer)id;
-				default:
-					return super.getInt(columnIndex);
 			}
 		}
 	}

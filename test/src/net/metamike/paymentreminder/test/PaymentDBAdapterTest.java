@@ -8,8 +8,10 @@ import net.metamike.paymentreminder.data.Payment;
 import net.metamike.paymentreminder.data.PaymentDBAdapter;
 import net.metamike.paymentreminder.data.PaymentDBAdapter.ReminderType;
 import net.metamike.paymentreminder.test.PaymentsTest.KnownCursor;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.test.AndroidTestCase;
 import android.test.MoreAsserts;
 import android.test.RenamingDelegatingContext;
@@ -42,16 +44,15 @@ public class PaymentDBAdapterTest extends AndroidTestCase {
 		Long exAmountPaid = 430430L;
 		String exDatePaid = now.format3339(true);
 		String exConf = "confirmed";
-		Map<Integer, Object> values = new HashMap<Integer, Object>();
-		values.put(KnownCursor.ACCOUNT, exAccount);
-		values.put(KnownCursor.AMOUNT_DUE, exAmountDue);
-		values.put(KnownCursor.DATE_DUE, exDateDue);
-		values.put(KnownCursor.AMOUNT_PAID, exAmountPaid);
-		values.put(KnownCursor.DATE_XFER, exDatePaid);
-		values.put(KnownCursor.CONF, exConf);
-		values.put(KnownCursor.ID, Integer.valueOf(1));
+		Bundle values = new Bundle();
+		values.putString(PaymentDBAdapter.KEY_ACCOUNT, exAccount);
+		values.putString(PaymentDBAdapter.KEY_AMOUNT_DUE, exAmountDue.toString());
+		values.putString(PaymentDBAdapter.KEY_DATE_DUE, exDateDue);
+		values.putString(PaymentDBAdapter.KEY_AMOUNT_PAID, exAmountPaid.toString());
+		values.putString(PaymentDBAdapter.KEY_DATE_TRANSFER, exDatePaid);
+		values.putString(PaymentDBAdapter.KEY_CONFIRMATION, exConf);
 
-		Payment p = new Payment(new KnownCursor(values));
+		Payment p = new Payment(values);
 
 		
 		PaymentDBAdapter adapter = new PaymentDBAdapter(testContext);
@@ -93,14 +94,13 @@ public class PaymentDBAdapterTest extends AndroidTestCase {
 	}
 
 	public void testInsertsConstraintsPayments() {
-		Map<Integer, Object> values = new HashMap<Integer, Object>();
-		values.put(KnownCursor.ACCOUNT, null);
-		values.put(KnownCursor.AMOUNT_DUE, null);
-		values.put(KnownCursor.DATE_DUE, null);
-		values.put(KnownCursor.AMOUNT_PAID, null);
-		values.put(KnownCursor.DATE_XFER, null);
-		values.put(KnownCursor.CONF, null);
-		values.put(KnownCursor.ID, null);
+		Bundle values = new Bundle();
+		values.putString(PaymentDBAdapter.KEY_ACCOUNT, null);
+		values.putString(PaymentDBAdapter.KEY_AMOUNT_DUE, null);
+		values.putString(PaymentDBAdapter.KEY_DATE_DUE, null);
+		values.putString(PaymentDBAdapter.KEY_AMOUNT_PAID, null);
+		values.putString(PaymentDBAdapter.KEY_DATE_TRANSFER, null);
+		values.putString(PaymentDBAdapter.KEY_CONFIRMATION, null);
 		Payment p;
 		
 		PaymentDBAdapter adapter = new PaymentDBAdapter(testContext);
@@ -115,9 +115,8 @@ public class PaymentDBAdapterTest extends AndroidTestCase {
 			fail(e.getMessage());
 		}
 		
-		values.put(KnownCursor.ACCOUNT, "Test Account");
-		values.put(KnownCursor.ID, Integer.valueOf(1));
-		p = new Payment(new KnownCursor(values));
+		values.putString(PaymentDBAdapter.KEY_ACCOUNT, "Test Account");
+		p = new Payment(values);
 
 		//Nulls for these should use the DEFAULTs 
 		assertTrue("Succeeded inserting payment with null account.", adapter.insertPayment(p));
@@ -229,15 +228,13 @@ public class PaymentDBAdapterTest extends AndroidTestCase {
 		t.set(2, Calendar.JANUARY, 2012);
 		expectedDate[3] = (new Time(t)).format3339(true);
 		
-		Map<Integer, Object> values = new HashMap<Integer, Object>();
+		ContentValues values = new ContentValues();
 		
-		for (int i = 0; i < expectedAccounts.length; i++) {
-			values.put(KnownCursor.ACCOUNT, expectedAccounts[i]);
-			values.put(KnownCursor.DATE_DUE, expectedDate[i]);
-			values.put(KnownCursor.ID, Integer.valueOf(i));
-
-			Payment p = new Payment(new KnownCursor(values));
-			assertTrue(adapter.insertPayment(p));
+		SQLiteDatabase db = adapter.getDatabase();
+		for (int i = 0; i < expectedAccounts.length; i++) {			
+			values.put(PaymentDBAdapter.KEY_ACCOUNT, expectedAccounts[i]);
+			values.put(PaymentDBAdapter.KEY_DATE_DUE, expectedDate[i]);
+			assertTrue(db.insert("payments", null, values) > 0);
 		}
 		
 		c = adapter.getAllPayments();

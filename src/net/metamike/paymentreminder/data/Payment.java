@@ -15,7 +15,8 @@ import android.util.TimeFormatException;
  *
  */
 public final class Payment {
-	private int recordID;
+	public static final Long NO_ID = Long.valueOf(0L);
+	private Long recordID;
 	
 	// context.getResources().getConfiguration().locale
 	private String account;
@@ -42,7 +43,7 @@ public final class Payment {
 		amountPaid = null;
 		dayDue = null;		
 		dayXfer = null;
-		recordID = -1;
+		recordID = NO_ID;
 	}
 	
 	public Payment(Cursor c) {
@@ -50,7 +51,7 @@ public final class Payment {
 		if (TextUtils.isEmpty(account))
 			throw new IllegalArgumentException("The value for account is empty.");
 		conf = c.getString(c.getColumnIndex(PaymentDBAdapter.KEY_CONFIRMATION));
-		recordID = c.getInt(c.getColumnIndex(PaymentDBAdapter.KEY_ID));
+		recordID = Long.valueOf(c.getLong(c.getColumnIndex(PaymentDBAdapter.KEY_ID)));
 		
 		amountDue = Payment.getLong(c, c.getColumnIndex(PaymentDBAdapter.KEY_AMOUNT_DUE));
 		amountPaid = Payment.getLong(c, c.getColumnIndex(PaymentDBAdapter.KEY_AMOUNT_PAID));
@@ -74,25 +75,44 @@ public final class Payment {
 		if (TextUtils.isEmpty(account))
 			throw new IllegalArgumentException("The value for account is empty.");
 		conf = b.getString(PaymentDBAdapter.KEY_CONFIRMATION);
-		recordID = -1;
 		
-		amountDue = Long.valueOf(b.getString(PaymentDBAdapter.KEY_AMOUNT_DUE));
-		amountPaid = Long.valueOf(b.getString(PaymentDBAdapter.KEY_AMOUNT_PAID));
+		try {
+			recordID = Long.valueOf(b.getString(PaymentDBAdapter.KEY_ID));
+		} catch (NumberFormatException nfe) {
+			recordID = NO_ID;
+		}
 
 		try {
-			dayDue = new Time();  
-			dayDue.parse3339(b.getString(PaymentDBAdapter.KEY_DATE_DUE));
+			amountDue = Long.valueOf(b.getString(PaymentDBAdapter.KEY_AMOUNT_DUE));
+		}  catch (Exception e) {
+			//TODO: get more specific exception
+			amountDue = null;
+		}
+		try {
+			amountPaid = Long.valueOf(b.getString(PaymentDBAdapter.KEY_AMOUNT_PAID));
+		} catch (Exception e) {
+			//TODO: get more specific exception
+			amountPaid = null;
+		}
+
+		try {
+			String d = b.getString(PaymentDBAdapter.KEY_DATE_DUE);
+			if (d != null) {
+				dayDue = new Time();  
+				dayDue.parse3339(d);
+			}
 		} catch (TimeFormatException tfe) {
 			dayDue = null;
 		}
 		try {
-			dayXfer = new Time();
-			dayXfer.parse3339(b.getString(PaymentDBAdapter.KEY_DATE_TRANSFER));
+			String d = b.getString(PaymentDBAdapter.KEY_DATE_TRANSFER);
+			if (d != null) {
+				dayXfer = new Time();
+				dayXfer.parse3339(d);
+			}
 		} catch (TimeFormatException tfe) {
 			dayXfer = null;
 		}
-
-		
 	}
 	
 	private static Long getLong(Cursor c, int column) {
@@ -103,13 +123,20 @@ public final class Payment {
 		return c.isNull(column) ? "" : c.getString(column);
 	}
 	
-	int getRecordID() throws NoSuchFieldException {
-		if (recordID > 0) {
-			return recordID;
-		} else {
-			throw new NoSuchFieldException("There is no record ID established for this payment.");
-		}
-		
+	Long getRecordID() {
+		return recordID;
+	}
+	
+	public Bundle generateBundle() {
+		Bundle b = new Bundle();
+		b.putString(PaymentDBAdapter.KEY_ACCOUNT, this.getAccount());
+		b.putString(PaymentDBAdapter.KEY_AMOUNT_DUE, this.getAmountDue());
+		b.putString(PaymentDBAdapter.KEY_DATE_DUE, this.getDueDate());
+		b.putString(PaymentDBAdapter.KEY_AMOUNT_PAID, this.getAmountPaid());
+		b.putString(PaymentDBAdapter.KEY_DATE_TRANSFER, this.getTransferDate());
+		b.putString(PaymentDBAdapter.KEY_CONFIRMATION, this.getConfirmation());
+		b.putString(PaymentDBAdapter.KEY_ID, this.getRecordID().toString());
+		return b;
 	}
 	
 	public String getAccount() {
