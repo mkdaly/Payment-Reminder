@@ -198,7 +198,7 @@ public class EntryActivityUnitTest extends ActivityUnitTestCase<EntryActivity> {
 		String exID = "1";
 
 		Intent viewIntent = new Intent(testContext, EntryActivity.class);
-		viewIntent.setAction(ListActivity.LOAD_INTENT);
+		viewIntent.setAction(ListActivity.EDIT_INTENT);
 		viewIntent.putExtra(PaymentDBAdapter.KEY_ACCOUNT, exAccount);
 		viewIntent.putExtra(PaymentDBAdapter.KEY_AMOUNT_DUE, exAmountDue);
 		viewIntent.putExtra(PaymentDBAdapter.KEY_DATE_DUE, exDateDue);
@@ -229,7 +229,7 @@ public class EntryActivityUnitTest extends ActivityUnitTestCase<EntryActivity> {
 	
 	public void testViewEntryNoID() {
 		Intent viewIntent = new Intent(testContext, EntryActivity.class);
-		viewIntent.setAction(ListActivity.LOAD_INTENT);
+		viewIntent.setAction(ListActivity.EDIT_INTENT);
 		startActivity(viewIntent, null, null);
 		assertTrue(isFinishCalled());
 	}
@@ -239,7 +239,7 @@ public class EntryActivityUnitTest extends ActivityUnitTestCase<EntryActivity> {
 		String exID = Payment.NO_ID.toString();
 
 		Intent viewIntent = new Intent(testContext, EntryActivity.class);
-		viewIntent.setAction(ListActivity.LOAD_INTENT);
+		viewIntent.setAction(ListActivity.EDIT_INTENT);
 		viewIntent.putExtra(PaymentDBAdapter.KEY_ID, exID);
 
 		startActivity(viewIntent, null, null);
@@ -251,7 +251,7 @@ public class EntryActivityUnitTest extends ActivityUnitTestCase<EntryActivity> {
 		String exID = "-1";
 
 		Intent viewIntent = new Intent(testContext, EntryActivity.class);
-		viewIntent.setAction(ListActivity.LOAD_INTENT);
+		viewIntent.setAction(ListActivity.EDIT_INTENT);
 		viewIntent.putExtra(PaymentDBAdapter.KEY_ID, exID);
 
 		startActivity(viewIntent, null, null);
@@ -263,7 +263,7 @@ public class EntryActivityUnitTest extends ActivityUnitTestCase<EntryActivity> {
 		String exID = "one";
 
 		Intent viewIntent = new Intent(testContext, EntryActivity.class);
-		viewIntent.setAction(ListActivity.LOAD_INTENT);
+		viewIntent.setAction(ListActivity.EDIT_INTENT);
 		viewIntent.putExtra(PaymentDBAdapter.KEY_ID, exID);
 
 		startActivity(viewIntent, null, null);

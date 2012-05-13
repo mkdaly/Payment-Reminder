@@ -1,13 +1,9 @@
 package net.metamike.paymentreminder.test;
 
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.metamike.paymentreminder.ListActivity;
-import net.metamike.paymentreminder.data.Payment;
 import net.metamike.paymentreminder.data.PaymentDBAdapter;
-import net.metamike.paymentreminder.test.PaymentsTest.KnownCursor;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -75,7 +71,7 @@ public class ListActivityUnitTest extends ActivityUnitTestCase<ListActivity> {
 		for (int idx = 0; idx < expectedOrder.length; idx++) {
 			listView.performItemClick(null, idx, listView.getAdapter().getItemId(idx));
 			Intent i = getStartedActivityIntent();
-			assertEquals(ListActivity.LOAD_INTENT, i.getAction());
+			assertEquals(ListActivity.VIEW_INTENT, i.getAction());
 			assertEquals(expectedAccounts[expectedOrder[idx]], i.getStringExtra(PaymentDBAdapter.KEY_ACCOUNT));
 			assertEquals(expectedDates[expectedOrder[idx]], i.getStringExtra(PaymentDBAdapter.KEY_DATE_DUE));
 			assertEquals(expectedIDs[expectedOrder[idx]].toString(), i.getStringExtra(PaymentDBAdapter.KEY_ID));
@@ -95,6 +91,15 @@ public class ListActivityUnitTest extends ActivityUnitTestCase<ListActivity> {
 		assertEquals("", i.getStringExtra(PaymentDBAdapter.KEY_DATE_TRANSFER));
 		assertEquals("", i.getStringExtra(PaymentDBAdapter.KEY_CONFIRMATION));
 		 */
+	}
+	
+	public void testMenu() {
+		startActivity(new Intent(), null, null);
+		ListActivity activity = getActivity();
+		assertTrue(getInstrumentation().invokeMenuActionSync(activity, net.metamike.paymentreminder.R.id.list_new_payment, 0));
+		Intent i = getStartedActivityIntent();
+		assertNotNull(i);
+		assertEquals(ListActivity.NEW_ACTION, i.getAction());
 	}
 	
 	private void loadData(PaymentDBAdapter dbAdapter) {		

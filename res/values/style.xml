@@ -11,4 +11,27 @@
     	<item name="android:marqueeRepeatLimit">marquee_forever</item>
     	<item name="android:focusable">true</item>
     </style>
+    
+    <style name="Text"  parent="@android:style/Theme.Black">
+        <item name="android:layout_height">wrap_content</item>
+    	<item name="android:layout_width">fill_parent</item>
+    	<item name="android:ellipsize">marquee</item>
+    	<item name="android:singleLine">true</item>
+    	<item name="android:marqueeRepeatLimit">marquee_forever</item>
+    	<item name="android:focusable">true</item>        
+    </style>
+    
+    <style name="Text.Label">
+        <item name="android:textSize">16sp</item>        
+    </style>
+    
+    <style name="Text.Data" >
+        <item name="android:textSize">14sp</item>
+    </style>
+    
+    <style name="Text.Data.View">
+        <item name="android:paddingLeft">10sp</item>
+        <item name="android:paddingBottom">5sp</item>
+    </style>
+    
 </resources>

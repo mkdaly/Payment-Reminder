@@ -5,17 +5,26 @@ import net.metamike.paymentreminder.data.Payment;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 public class ListActivity extends Activity {
-	public static final String LOAD_INTENT = "net.metamike.paymentreminder.EntryActivity.LOAD";
+	public static final String EDIT_INTENT = "net.metamike.paymentreminder.EntryActivity.EDIT";
 	public static final String VIEW_INTENT = "net.metamike.paymentreminder.EntryActivity.VIEW";
+	public static final String NEW_ACTION = "net.metamike.paymentreminder.EntryActivity.NEW";
 	public static final String DATA = "DATA";
+	
+	private Intent newPayment;
 	
 	private ListView listView;
 	private SimpleCursorAdapter adapter;
@@ -26,6 +35,7 @@ public class ListActivity extends Activity {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.list);
+        newPayment = new Intent(NEW_ACTION, Uri.EMPTY, getApplicationContext(), EntryActivity.class);
         dbAdapter = new PaymentDBAdapter(this);
         dbAdapter.open();
         Cursor c = dbAdapter.getAllPayments();
@@ -36,7 +46,19 @@ public class ListActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				sendIntent(position, new Intent(ListActivity.LOAD_INTENT));
+				Intent i = new Intent(ListActivity.VIEW_INTENT);
+				i.setClass(getApplicationContext(), ViewActivity.class);
+				sendIntent(position, i);
+			}
+		});
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				Intent i = new Intent(ListActivity.EDIT_INTENT);
+				i.setClass(getApplicationContext(), EntryActivity.class);
+				sendIntent(position, i);
+				return false;
 			}
 		});
 
@@ -53,10 +75,30 @@ public class ListActivity extends Activity {
 
         
 	}
+	
+	
 		
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.list_menu, menu);
+		menu.findItem(R.id.list_new_payment).setIntent(newPayment);
+		return true;
+	}
+
+
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		// TODO Auto-generated method stub
+		super.onCreateContextMenu(menu, v, menuInfo);
+	}
+
+
+
 	private void sendIntent(int position, Intent i) {
 		Cursor c = (Cursor)this.adapter.getItem(position);
-		i.setClass(this, EntryActivity.class);
 		i.putExtras(populateBundle(c));
 		startActivity(i);
 	}

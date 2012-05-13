@@ -57,7 +57,7 @@ public class EntryActivity extends Activity {
 			@Override public void onClick(View v) { clearFields(); } });
         
 		Intent i = getIntent();
-		if (ListActivity.LOAD_INTENT.equals(i.getAction())) {
+		if (ListActivity.EDIT_INTENT.equals(i.getAction())) {
 			loadFromBundle(i.getExtras());
 		}
     }

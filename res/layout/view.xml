@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/viewRoot"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@id/label_account"
+        android:text="@string/LABEL_ACCOUNT"
+        style="@style/Text.Label"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+    <TextView
+        android:id="@+id/view_field_account"
+        style="@style/Text.Data.View"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+    
+    <TextView
+        android:id="@id/label_amount_due"
+        android:text="@string/LABEL_AMOUNT_DUE"
+        style="@style/Text.Label"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+    <TextView
+        android:id="@+id/view_field_due"
+		style="@style/Text.Data.View"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+    
+    <TextView
+        android:id="@id/label_amount_paid"
+        android:text="@string/LABEL_AMOUNT_PAID"
+        style="@style/Text.Label"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+    <TextView
+        android:id="@+id/view_field_paid"
+        style="@style/Text.Data.View"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+</LinearLayout>
