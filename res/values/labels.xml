@@ -10,6 +10,7 @@
     <string name="LABEL_CONFIRMATION">Confirmation</string>
     <string name="LABEL_DATES">Dates</string>
     <string name="LABEL_SAVE">Save</string>
+    <string name="LABEL_CLEAR">Clear</string>
     <string name="LABEL_CANCEL">Cancel</string>
     
 </resources>

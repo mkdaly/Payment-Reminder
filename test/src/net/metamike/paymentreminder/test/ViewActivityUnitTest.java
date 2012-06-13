@@ -30,9 +30,11 @@ public class ViewActivityUnitTest extends ActivityUnitTestCase<ViewActivity> {
 		String exAmountDue = "2";
 		String exAmountDueFormatted = "$2.00"; //For USD
 		String exDateDue = "2012-03-15";
+		String exDateDueFormatted = " on March 15";
 		String exAmountPaid = "3";
 		String exAmountPaidFormatted = "$3.00";  //For USD
 		String exTransferferDate = "2012-03-12";
+		String exTransferferDateFormatted = " on March 12";
 		String exConf = "confirmed";
 		String exID = "1";
 
@@ -56,8 +58,8 @@ public class ViewActivityUnitTest extends ActivityUnitTestCase<ViewActivity> {
 		//TextView reminders = 
 		
 		assertEquals(exAccount, account.getText());
-		assertEquals(exAmountDueFormatted + " on March 15", due.getText());
-		assertEquals(exAmountPaidFormatted + " on March 12", paid.getText());		
+		assertEquals(exAmountDueFormatted + exDateDueFormatted, due.getText());
+		assertEquals(exAmountPaidFormatted + exTransferferDateFormatted, paid.getText());		
 	}
 	
 	public void testNoAccount() {

@@ -14,6 +14,7 @@ public class AllTests {
 		suite.addTestSuite(ListActivityTest.class);
 		suite.addTestSuite(ListActivityUnitTest.class);
 		suite.addTestSuite(PaymentsTest.class);
+		suite.addTestSuite(ViewActivityUnitTest.class);
 		//suite.addTestSuite(RemindersTest.class);
 		//$JUnit-END$
 		return suite;

@@ -251,4 +251,44 @@ public class PaymentDBAdapterTest extends AndroidTestCase {
 		adapter.close();
 		
 	}
+	
+	public void testDeletePayments() {
+		PaymentDBAdapter adapter = new PaymentDBAdapter(testContext);
+		adapter.open();
+		Cursor c = adapter.getAllPayments();
+		assertEquals(0, c.getCount());
+				
+		String[] expectedAccounts = {"Test 1", "Test 2", 
+				"Test 4", "Test 3"};
+		
+		String[] expectedDate = new String[4];
+		Time t = new Time();
+		t.set(1, Calendar.JANUARY, 2012);
+		expectedDate[0] = (new Time(t)).format3339(true);
+		t.set(1, Calendar.FEBRUARY, 2012);
+		expectedDate[1] = (new Time(t)).format3339(true);
+		t.set(1, Calendar.JUNE, 2012);
+		expectedDate[2] = (new Time(t)).format3339(true);		
+		t.set(2, Calendar.JANUARY, 2012);
+		expectedDate[3] = (new Time(t)).format3339(true);
+		
+		ContentValues values = new ContentValues();
+		
+		Long[] ids = new Long[expectedAccounts.length];
+		
+		SQLiteDatabase db = adapter.getDatabase();
+		for (int i = 0; i < expectedAccounts.length; i++) {			
+			values.put(PaymentDBAdapter.KEY_ACCOUNT, expectedAccounts[i]);
+			values.put(PaymentDBAdapter.KEY_DATE_DUE, expectedDate[i]);
+			long id = db.insert("payments", null, values);
+			assertTrue( id > 0);
+			ids[i] = id;
+		}
+		assertTrue(adapter.deletePayment(ids[1]));
+		assertEquals(ids.length -1, adapter.getAllPayments().getCount());
+		assertTrue(adapter.deletePayment(Long.toString(ids[2])));
+		assertFalse(adapter.deletePayment(ids[1]));
+		assertFalse(adapter.deletePayment("Bad"));
+		
+	}
 }

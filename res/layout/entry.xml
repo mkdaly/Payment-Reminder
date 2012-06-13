@@ -156,13 +156,22 @@
         android:weightSum="1.0">
         <Button
             android:id="@+id/button_save"
-            android:layout_weight=".5"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_weight=".33"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/LABEL_SAVE" />
         <Button
+            android:id="@+id/button_clear"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_weight=".34"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/LABEL_CLEAR" />
+        <Button
             android:id="@+id/button_cancel"
-            android:layout_weight=".5"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_weight=".33"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/LABEL_CANCEL" />

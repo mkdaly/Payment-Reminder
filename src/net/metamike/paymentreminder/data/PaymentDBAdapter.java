@@ -3,6 +3,7 @@ package net.metamike.paymentreminder.data;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import net.metamike.paymentreminder.R;
@@ -113,6 +114,15 @@ public final class PaymentDBAdapter {
 	}
 	*/
 	
+	public boolean deletePayment(long id) {
+		return this.deletePayment(Long.toString(id));
+		
+	}
+	
+	public boolean deletePayment(String id) {
+		return (database.delete(PAYMENTS_TABLE, KEY_ID + " = ?", new String[]{id})) == 1;
+	}
+
 	public boolean insertPayment(Payment p) {
 		return insertPayment(p.getRecordID(), p.getAccount(), p.getAmountDueForDB(), p.getDueDateForDB(),
 				p.getAmountPaidForDB(), p.getTransferDateForDB(), p.getConfirmation());		

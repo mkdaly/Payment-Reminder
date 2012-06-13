@@ -2,5 +2,7 @@
 <resources>
     <string name="menu_new_payment">New Payment</string>
     <string name="menu_new_reminder">New Reminder</string>
-    
+    <string name="menu_delete">Delete</string>
+    <string name="menu_view">View</string>
+    <string name="menu_edit">Edit</string>
 </resources>

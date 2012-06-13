@@ -187,7 +187,7 @@ public class EntryActivityUnitTest extends ActivityUnitTestCase<EntryActivity> {
 		assertTrue(account.isFocused());
 	}
 	
-	public void testViewEntry() {
+	public void testEditEntry() {
 		/** Setup */
 		String exAccount = "Test cancel";
 		String exAmountDue = "2";
@@ -227,14 +227,14 @@ public class EntryActivityUnitTest extends ActivityUnitTestCase<EntryActivity> {
 		assertEquals(exID, entryID.getText().toString());
 	}
 	
-	public void testViewEntryNoID() {
+	public void testEditEntryNoID() {
 		Intent viewIntent = new Intent(testContext, EntryActivity.class);
 		viewIntent.setAction(ListActivity.EDIT_INTENT);
 		startActivity(viewIntent, null, null);
 		assertTrue(isFinishCalled());
 	}
 	
-	public void testViewEntryBadID1() {
+	public void testEditEntryBadID1() {
 		/** Setup */
 		String exID = Payment.NO_ID.toString();
 
@@ -246,7 +246,7 @@ public class EntryActivityUnitTest extends ActivityUnitTestCase<EntryActivity> {
 		assertTrue(isFinishCalled());
 	}
 
-	public void testViewEntryBadID2() {
+	public void testEditEntryBadID2() {
 		/** Setup */
 		String exID = "-1";
 
@@ -258,7 +258,7 @@ public class EntryActivityUnitTest extends ActivityUnitTestCase<EntryActivity> {
 		assertTrue(isFinishCalled());
 	}
 
-	public void testViewEntryBadID3() {
+	public void testEditEntryBadID3() {
 		/** Setup */
 		String exID = "one";
 

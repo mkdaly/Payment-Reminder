@@ -1,5 +1,6 @@
 package net.metamike.paymentreminder.test;
 
+import java.util.Arrays;
 import java.util.Calendar;
 
 import net.metamike.paymentreminder.ListActivity;
@@ -7,8 +8,11 @@ import net.metamike.paymentreminder.data.PaymentDBAdapter;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.test.ActivityUnitTestCase;
 import android.test.RenamingDelegatingContext;
+import android.test.TouchUtils;
+import android.test.suitebuilder.annotation.Suppress;
 import android.text.format.Time;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -18,6 +22,9 @@ public class ListActivityUnitTest extends ActivityUnitTestCase<ListActivity> {
 	private String[] expectedAccounts;
 	private String[] expectedDates;
 	private Long[] expectedIDs;
+	private Integer[] expectedOrder;
+	private PaymentDBAdapter dbAdapter;
+
 	
 	
 	public ListActivityUnitTest() {
@@ -42,12 +49,21 @@ public class ListActivityUnitTest extends ActivityUnitTestCase<ListActivity> {
 		t.set(1, Calendar.JUNE, 2012);
 		expectedDates[2] = (new Time(t)).format3339(true);		
 		t.set(2, Calendar.JANUARY, 2012);
-		expectedDates[3] = (new Time(t)).format3339(true);		
-	}
-
-	public void testAdapter() {
-		PaymentDBAdapter dbAdapter = new PaymentDBAdapter(testContext);
+		expectedDates[3] = (new Time(t)).format3339(true);
+		
+		/** Order should be by date, asc. */
+		expectedOrder = new Integer[]{0, 3, 1, 2};
+		
+		dbAdapter = new PaymentDBAdapter(testContext);
 		dbAdapter.open();		
+	}
+	
+	@Override
+	public void tearDown() {
+		dbAdapter.close();
+	}
+	
+	public void testAdapter() {
 		loadData(dbAdapter);
 
 		startActivity(new Intent(), null, null);
@@ -57,17 +73,14 @@ public class ListActivityUnitTest extends ActivityUnitTestCase<ListActivity> {
 		assertEquals(expectedAccounts.length, listAdapter.getCount());
 	}
 	
-	public void testClickListeners() {
-		PaymentDBAdapter dbAdapter = new PaymentDBAdapter(testContext);
-		dbAdapter.open();		
+	public void testOnClickListener() {
+		//PaymentDBAdapter dbAdapter = new PaymentDBAdapter(testContext);
+		//dbAdapter.open();		
 		loadData(dbAdapter);
 		startActivity(new Intent(), null, null);
 		ListActivity activity = this.getActivity();
 		ListView listView = (ListView)activity.findViewById(net.metamike.paymentreminder.R.id.listView);
 		
-		/** Order should be by date, asc. */
-		Integer[] expectedOrder = {0, 3, 1, 2};
-
 		for (int idx = 0; idx < expectedOrder.length; idx++) {
 			listView.performItemClick(null, idx, listView.getAdapter().getItemId(idx));
 			Intent i = getStartedActivityIntent();
@@ -80,17 +93,56 @@ public class ListActivityUnitTest extends ActivityUnitTestCase<ListActivity> {
 			assertEquals("", i.getStringExtra(PaymentDBAdapter.KEY_DATE_TRANSFER));
 			assertEquals("", i.getStringExtra(PaymentDBAdapter.KEY_CONFIRMATION));
 		}
+	}
+	
+	@Suppress
+	public void testOnLongClickListeners() {
+		//PaymentDBAdapter dbAdapter = new PaymentDBAdapter(testContext);
+		//dbAdapter.open();		
+		loadData(dbAdapter);
+		startActivity(new Intent(), null, null);
+		ListActivity activity = this.getActivity();
+		ListView listView = (ListView)activity.findViewById(net.metamike.paymentreminder.R.id.listView);
+
+		/** long click listeners should display context menu */
+		for (int idx = 0; idx < expectedOrder.length; idx++) {
+			listView.showContextMenuForChild(listView.getChildAt(idx));
+			//listView.getSelectedView().performLongClick();
+			//listView.performItemClick(null, idx, listView.getAdapter().getItemId(idx));
+			Intent i = getStartedActivityIntent();
+			assertEquals(ListActivity.EDIT_INTENT, i.getAction());
+			assertEquals(expectedAccounts[expectedOrder[idx]], i.getStringExtra(PaymentDBAdapter.KEY_ACCOUNT));
+			assertEquals(expectedDates[expectedOrder[idx]], i.getStringExtra(PaymentDBAdapter.KEY_DATE_DUE));
+			assertEquals(expectedIDs[expectedOrder[idx]].toString(), i.getStringExtra(PaymentDBAdapter.KEY_ID));
+			assertEquals("", i.getStringExtra(PaymentDBAdapter.KEY_AMOUNT_DUE));
+			assertEquals("", i.getStringExtra(PaymentDBAdapter.KEY_AMOUNT_PAID));
+			assertEquals("", i.getStringExtra(PaymentDBAdapter.KEY_DATE_TRANSFER));
+			assertEquals("", i.getStringExtra(PaymentDBAdapter.KEY_CONFIRMATION));
+		}
+	}
+	
+	@Suppress
+	public void testDelete() {
+		//PaymentDBAdapter dbAdapter = new PaymentDBAdapter(testContext);
+		//dbAdapter.open();		
+		loadData(dbAdapter);
+		Intent delIntent = new Intent(testContext, ListActivity.class);
+		delIntent.setAction(ListActivity.DELETE_INTENT);
+		delIntent.putExtra(PaymentDBAdapter.KEY_ID, expectedIDs[1].toString());
+		startActivity(delIntent, null, null);
+		ListActivity activity = this.getActivity();
+		ListView listView = (ListView)activity.findViewById(net.metamike.paymentreminder.R.id.listView);
+		ListAdapter adapter = listView.getAdapter();
+		assertEquals(expectedIDs.length -1, adapter.getCount());
+		Long[] cursorIDs = new Long[adapter.getCount()];
+		for (int i = 0; i < adapter.getCount(); i++) {
+			Cursor c = (Cursor)adapter.getItem(i);
+			cursorIDs[i] = c.getLong(c.getColumnIndex(PaymentDBAdapter.KEY_ID));
+		}
+		assertTrue(Arrays.binarySearch(cursorIDs, expectedIDs[1]) < 0);
 		
-		/*
-		listView.performItemClick(null, 0, listView.getAdapter().getItemId(0));
-		i = getStartedActivityIntent();
-		assertEquals(ListActivity.LOAD_INTENT, i.getAction());
-		assertEquals(expectedAccounts[0], i.getStringExtra(PaymentDBAdapter.KEY_ACCOUNT));
-		assertEquals(expectedDates[0], i.getStringExtra(PaymentDBAdapter.KEY_DATE_DUE));
-		assertEquals("", i.getStringExtra(PaymentDBAdapter.KEY_AMOUNT_PAID));
-		assertEquals("", i.getStringExtra(PaymentDBAdapter.KEY_DATE_TRANSFER));
-		assertEquals("", i.getStringExtra(PaymentDBAdapter.KEY_CONFIRMATION));
-		 */
+		
+		
 	}
 	
 	public void testMenu() {

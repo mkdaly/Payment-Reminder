@@ -44,22 +44,34 @@ public class EntryActivityTest extends ActivityInstrumentationTestCase2<EntryAct
 		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_transfer_date));
 		assertNotNull(entryView.findViewById(net.metamike.paymentreminder.R.id.field_transfer_reminder));
 		
-
+		/* Buttons */
 		LinearLayout buttonsView = (LinearLayout)mainView.findViewById(net.metamike.paymentreminder.R.id.buttonsView);
 		assertNotNull(buttonsView);
-		assertNotNull(buttonsView.findViewById(net.metamike.paymentreminder.R.id.button_cancel));
-		assertNotNull(buttonsView.findViewById(net.metamike.paymentreminder.R.id.button_save));
+		
+		Button cancel = (Button)buttonsView.findViewById(net.metamike.paymentreminder.R.id.button_cancel);
+		Button save = (Button)buttonsView.findViewById(net.metamike.paymentreminder.R.id.button_save);
+		Button clear = (Button)buttonsView.findViewById(net.metamike.paymentreminder.R.id.button_clear);
+		
+		assertNotNull(cancel);
+		assertNotNull(save);
+		assertNotNull(clear);
 		
 		/* Test that button is visible on the screen */
-		Button cancel = (Button)activity.findViewById(net.metamike.paymentreminder.R.id.button_cancel);
-
 		int[] mainLocation = new int[2];
 		mainView.getLocationOnScreen(mainLocation);
-		int[] cancelLocation = new int[2];
-		cancel.getLocationOnScreen(cancelLocation);
 		
-		assertTrue(cancelLocation[0] + cancel.getWidth() <= mainLocation[0] + mainView.getWidth());
-		assertTrue(cancelLocation[1] + cancel.getHeight() <= mainLocation[1] + mainView.getHeight());
+		int[] buttonLocation = new int[2];
 		
+		cancel.getLocationOnScreen(buttonLocation);
+		assertTrue(buttonLocation[0] + cancel.getWidth() <= mainLocation[0] + mainView.getWidth());
+		assertTrue(buttonLocation[1] + cancel.getHeight() <= mainLocation[1] + mainView.getHeight());
+		
+		save.getLocationOnScreen(buttonLocation);
+		assertTrue(buttonLocation[0] + save.getWidth() <= mainLocation[0] + mainView.getWidth());
+		assertTrue(buttonLocation[1] + save.getHeight() <= mainLocation[1] + mainView.getHeight());
+		
+		clear.getLocationOnScreen(buttonLocation);
+		assertTrue(buttonLocation[0] + clear.getWidth() <= mainLocation[0] + mainView.getWidth());
+		assertTrue(buttonLocation[1] + clear.getHeight() <= mainLocation[1] + mainView.getHeight());		
 	}
 }
